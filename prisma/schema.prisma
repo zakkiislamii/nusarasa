@@ -1,0 +1,24 @@
+// schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+}
+
+model Users {
+  id            String      @default(cuid()) @id
+  first_name    String
+  last_name     String
+  password      String
+  address       String
+  number_phone  String
+  email         String      @unique
+  username      String      @unique
+  createdAt     DateTime    @default(now()) @map(name: "created_at")
+  updatedAt     DateTime    @updatedAt @map(name: "updated_at")
+}
