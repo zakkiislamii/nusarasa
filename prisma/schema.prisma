@@ -1,17 +1,14 @@
-// schema.prisma
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
-  url = env("POSTGRES_PRISMA_URL") // uses connection pooling
-  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+  url       = env("DATABASE_URL") 
 }
 
 model Users {
-  id            String      @default(cuid()) @id
+  id_user       String      @default(cuid()) @id @map(name: "id_user")
   first_name    String
   last_name     String
   password      String
