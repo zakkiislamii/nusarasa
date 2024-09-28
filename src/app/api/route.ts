@@ -5,5 +5,6 @@ const prisma = new PrismaClient();
 
 export const GET = async () => {
   const tes = await prisma.users.findMany({});
+  
   return NextResponse.json({ tes });
 };
