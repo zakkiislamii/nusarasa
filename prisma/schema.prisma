@@ -9,13 +9,13 @@ datasource db {
 
 model Users {
   id_user       String      @default(cuid()) @id @map(name: "id_user")
-  first_name    String
-  last_name     String
-  password      String
-  address       String
-  number_phone  String
-  email         String      @unique
-  username      String      @unique
+  first_name    String?
+  last_name     String?
+  password      String?
+  address       String?
+  number_phone  String?
+  email         String?     @unique
+  username      String?      @unique
   createdAt     DateTime    @default(now()) @map(name: "created_at")
   updatedAt     DateTime    @updatedAt @map(name: "updated_at")
 }

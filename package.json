@@ -24,12 +24,14 @@
     "@types/bcrypt": "^5.0.2",
     "@vercel/postgres": "^0.10.0",
     "bcrypt": "^5.1.1",
+    "express": "^4.21.0",
     "firebase": "^10.13.2",
     "next": "14.2.13",
     "react": "^18",
     "react-dom": "^18"
   },
   "devDependencies": {
+    "@types/express": "^5.0.0",
     "@types/node": "^20.16.9",
     "@types/react": "^18",
     "@types/react-dom": "^18",
