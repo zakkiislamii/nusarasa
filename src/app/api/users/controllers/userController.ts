@@ -193,7 +193,6 @@ export const deleteUser = async (req: NextRequest, id: string) => {
         }
       );
     }
-
     const checked = await existingDeleteUser({ id });
     if (!checked) {
       return NextResponse.json(
@@ -210,7 +209,6 @@ export const deleteUser = async (req: NextRequest, id: string) => {
     } else {
       const deletedUser = await deleterUserById({ id });
       if (!deletedUser) {
-        // Check if the user was deleted successfully
         return NextResponse.json(
           {
             code: 404,
