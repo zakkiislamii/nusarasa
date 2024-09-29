@@ -6,7 +6,7 @@ import {
   existingDeleteUser,
 } from "../queries/userQueries";
 import { NextResponse, NextRequest } from "next/server";
-import { API_KEY } from "../../config/config";
+import { API_KEY } from "../../../config/config";
 import bcrypt from "bcrypt/";
 
 export const getAllUsers = async (req: NextRequest) => {
