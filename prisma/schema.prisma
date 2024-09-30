@@ -14,8 +14,9 @@ model Users {
   password      String?
   address       String?
   number_phone  String?
+  token         String?     @unique
   email         String?     @unique
-  username      String?      @unique
+  username      String?     @unique
   createdAt     DateTime    @default(now()) @map(name: "created_at")
   updatedAt     DateTime    @updatedAt @map(name: "updated_at")
 }

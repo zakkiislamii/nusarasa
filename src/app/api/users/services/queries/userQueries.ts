@@ -50,3 +50,22 @@ export const existingDeleteUser = async ({ id }: { id: string }) => {
   });
   return data;
 };
+
+export const findUser = async ({ username }: { username: string }) => {
+  const data = await prisma.users.findUnique({ where: { username: username } });
+  return data;
+};
+
+export const saveToken = async ({
+  token,
+  username,
+}: {
+  token: string;
+  username: string;
+}) => {
+  const data = prisma.users.update({
+    where: { username },
+    data: { token },
+  });
+  return data;
+};

@@ -1,13 +1,6 @@
 import { NextRequest } from "next/server";
-import {
-  getAllUsers,
-  register,
-} from "../users/services/controllers/userController";
+import { getAllUsers } from "../users/services/controllers/userController";
 
 export const GET = async (req: NextRequest) => {
   return await getAllUsers(req);
-};
-
-export const POST = async (req: NextRequest) => {
-  return await register(req);
 };
