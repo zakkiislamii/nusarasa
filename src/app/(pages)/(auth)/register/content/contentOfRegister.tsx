@@ -1,25 +1,27 @@
 "use client";
-import React, { ChangeEvent, useState } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import email from "../../../../../assets/icon/email.png";
 import username from "../../../../../assets/icon/username.png";
 import password from "../../../../../assets/icon/password.png";
 import show from "../../../../../assets/icon/show.png";
 import hide from "../../../../../assets/icon/hide.png";
-import { toast, Toaster } from "sonner";
+import { handleChange, onSubmit } from "../services";
 import { useRouter } from "next/navigation";
-import axios from "axios";
 
+import { registerFormData } from "../interface";
+
+const data: registerFormData = {
+  username: "",
+  email: "",
+  password: "",
+  confirm_password: "",
+};
 export default function ContentRegister() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const { push } = useRouter();
-  const [formData, setFormData] = useState({
-    username: "",
-    password: "",
-    email: "",
-    confirm_password: "",
-  });
+  const [formData, setFormData] = useState(data);
+  const router = useRouter();
 
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
@@ -29,52 +31,11 @@ export default function ContentRegister() {
     setShowConfirmPassword((prev) => !prev);
   };
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    if (
-      name === "username" ||
-      name === "password" ||
-      name === "email" ||
-      name === "confirm_password"
-    ) {
-      setFormData({
-        ...formData,
-        [name]: value,
-      });
-    }
-  };
-
-  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    try {
-      const response = await axios.post("/api/users/register", formData, {
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": process.env.NEXT_PUBLIC_API_KEY,
-        },
-      });
-
-      if (response.data?.error) {
-        toast.error(`${response?.data?.message}`);
-      } else {
-        toast.success("Registration Successful");
-        push("/login");
-      }
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        toast.error(`${error.response?.data?.message}`);
-      } else {
-        toast.error("An unexpected error occurred. Please try again.");
-      }
-    }
-  };
-
   return (
     <div className="relative flex-1 p-6 flex justify-center items-center ">
-      <Toaster position="top-center" closeButton richColors expand={false} />
       <div className=" w-[35rem] text-[#554433] flex flex-col border border-black gap-[20px] relative text-center z-10 rounded-xl bg-[#F9F5F0]">
         <div className="p-5 pt-10 font-bold text-4xl">Buat Akun Baru</div>
-        <form onSubmit={onSubmit}>
+        <form onSubmit={(e) => onSubmit(e, formData, router.push)}>
           <div className="w-full flex flex-col gap-5 sm:gap-3 p-5">
             <style>
               {`
@@ -99,7 +60,7 @@ export default function ContentRegister() {
                   type="email"
                   placeholder="Email"
                   name="email"
-                  onChange={handleChange}
+                  onChange={(e) => handleChange(e, formData, setFormData)}
                   required
                   className="w-full max-w-[488px] h-10 sm:h-[40px] py-2 placeholder-custom-gray pl-12 pr-5 border text-[#1E1E1E] rounded-md text-left"
                 />
@@ -121,7 +82,7 @@ export default function ContentRegister() {
                   type="username"
                   name="username"
                   required
-                  onChange={handleChange}
+                  onChange={(e) => handleChange(e, formData, setFormData)}
                   placeholder="Username"
                   className="w-full max-w-[488px] h-10 sm:h-[40px] py-2 placeholder-custom-gray pl-12 pr-5 border text-[#1E1E1E] rounded-md text-left"
                 />
@@ -143,7 +104,7 @@ export default function ContentRegister() {
                   type={showPassword ? "text" : "password"}
                   placeholder="Password"
                   required
-                  onChange={handleChange}
+                  onChange={(e) => handleChange(e, formData, setFormData)}
                   name="password"
                   className="w-full max-w-[488px] h-10 sm:h-[40px] py-2 placeholder-custom-gray pl-12 pr-12 border text-[#1E1E1E] rounded-md text-left"
                 />
@@ -177,7 +138,7 @@ export default function ContentRegister() {
                   placeholder="Confirm Password"
                   name="confirm_password"
                   required
-                  onChange={handleChange}
+                  onChange={(e) => handleChange(e, formData, setFormData)}
                   className="w-full max-w-[488px] h-10 sm:h-[40px] py-2 placeholder-custom-gray pl-12 pr-12 border text-[#1E1E1E] rounded-md text-left"
                 />
                 <button
