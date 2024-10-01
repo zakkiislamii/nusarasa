@@ -32,7 +32,7 @@ export const onSubmit = async (
       toast.error(`${response?.data?.message}`);
     } else {
       toast.success("Login Successful");
-      push("/dashboard");
+      push("/data-diri");
     }
   } catch (error) {
     if (axios.isAxiosError(error)) {

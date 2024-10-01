@@ -7,6 +7,8 @@ import { LoginFormData } from "../components";
 import Link from "next/link";
 import { useTogglePassword } from "../components";
 import { icons } from "../components";
+import ButtonGoogle from "@/components/buttoms/buttom submit google";
+import Button from "@/components/buttoms/buttom submit";
 
 const data: LoginFormData = {
   username: "",
@@ -22,10 +24,13 @@ export default function ContentOfLogin(): JSX.Element {
 
   return (
     <div className="relative flex-1 p-6 flex justify-center items-center ">
-      <div className=" w-[35rem] text-[#554433] flex flex-col border border-black gap-[20px] relative text-center z-10 rounded-xl bg-[#F9F5F0]">
+      <div className=" w-[35rem] p-1 max-w-full text-[#554433] flex flex-col border border-black gap-[15px] relative text-center items-center justify-center z-10 rounded-xl bg-[#F9F5F0]">
         <div className="p-5 pt-10 font-bold text-4xl">Selamat Datang!</div>
-        <form onSubmit={(e) => onSubmit(e, formData, router.push)}>
-          <div className="w-full flex flex-col gap-5 sm:gap-3 p-5">
+        <form
+          onSubmit={(e) => onSubmit(e, formData, router.push)}
+          className="w-full max-w-full p-2"
+        >
+          <div className="w-full flex flex-col gap-5 p-5">
             <style>
               {`
                   .placeholder-custom-gray::placeholder {
@@ -37,7 +42,7 @@ export default function ContentOfLogin(): JSX.Element {
             {/* Username */}
             <div className="flex flex-col gap-3 sm:gap-4">
               <div className="relative flex justify-center items-center text-[#1E1E1E]">
-                <div className="absolute sm:left-7 left-5 flex items-center">
+                <div className="absolute sm:left-4 left-5 flex items-center">
                   <Image
                     quality={100}
                     src={iconUsername}
@@ -59,7 +64,7 @@ export default function ContentOfLogin(): JSX.Element {
             {/* Password */}
             <div className="flex flex-col gap-3 sm:gap-4">
               <div className="relative flex justify-center items-center text-[#1E1E1E]">
-                <div className="absolute sm:left-7 left-5 flex items-center">
+                <div className="absolute sm:left-4 left-5 flex items-center">
                   <Image
                     quality={100}
                     src={iconPassword}
@@ -89,26 +94,24 @@ export default function ContentOfLogin(): JSX.Element {
               </div>
             </div>
           </div>
-
-          <button className="bg-[#F4991A] w-[25rem] py-3 me-10 ms-10 text-white font-bold rounded-3xl ">
-            Login
-          </button>
+          <Button>Login</Button>
         </form>
-        <div className="flex items-center  max-w-full ps-10 pe-10">
-          <hr className="flex-grow border-t border-gray-300" />
-          <span className="mx-4 text-gray-500">Atau</span>
-          <hr className="flex-grow border-t border-gray-300" />
+        <div className="flex items-center max-w-full w-[90%]">
+          <hr className="flex-grow border-t border-black" />
+          <span className="mx-4 text-black">Atau</span>
+          <hr className="flex-grow border-t border-black" />
         </div>
 
-        <button className="bg-white py-3 me-10 ms-10 border font-bold rounded-3xl  ">
-          Login dengan Google
-        </button>
+        <form action="" className="w-full max-w-full">
+          <ButtonGoogle> Login dengan Google</ButtonGoogle>
+        </form>
+
         <p className="text-[#554433] pb-10 font-bold">
           Belum punya akun?{" "}
           <Link className="cursor-pointer" href="/register">
             {" "}
             <span className="text-[#F4991A] hover:text-[#fdce40]">
-              Login di sini.
+              Register di sini.
             </span>
           </Link>
         </p>

@@ -5,6 +5,7 @@ import { icons } from "../components";
 import { onSubmit, handleChange } from "../services";
 import { dataDiriFormData } from "../components";
 import { useState } from "react";
+import Button from "@/components/buttoms/buttom submit";
 
 const data: dataDiriFormData = {
   first_name: "",
@@ -19,13 +20,13 @@ export default function ContentDataDiri() {
   const [formData, setFormData] = useState(data);
   return (
     <div className=" relative flex-1 p-6 flex justify-center items-center ">
-      <div className=" w-[35rem] max-w-full text-[#F9F5F0] p-5 flex flex-col border border-[#F9F5F0] gap-[20px] relative text-center justify-center items-center z-10 rounded-xl backdrop-blur-md">
+      <div className=" w-[35rem] max-w-full text-[#F9F5F0] p-5 flex flex-col border border-[#F9F5F0] gap-[50px] relative text-center justify-center items-center z-10 rounded-xl backdrop-blur-md">
         <div className="p-5 font-bold text-4xl">Isi data diri anda!</div>
         <form
           onSubmit={(e) => onSubmit(e, data, router.push)}
-          className="flex flex-col gap-3 p-3 justify-center items-center max-w-full"
+          className="w-full max-w-full p-2"
         >
-          <div className="w-full flex flex-col gap-5 p-5">
+          <div className="w-full flex flex-col gap-5 ">
             <style>
               {`
                   .placeholder-custom-gray::placeholder {
@@ -123,9 +124,7 @@ export default function ContentDataDiri() {
             </div>
           </div>
 
-          <button className="bg-[#F4991A] hover:bg-[#fdce40] max-w-full w-full border-white justify-center items-center  py-3 text-white font-bold rounded-3xl ">
-            Submit
-          </button>
+          <Button>Submit</Button>
         </form>
       </div>
     </div>
