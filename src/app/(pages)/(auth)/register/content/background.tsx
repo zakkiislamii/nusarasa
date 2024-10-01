@@ -1,12 +1,12 @@
 import Image from "next/image";
-import background from "../../../../../assets/bg/backgroudRegister.png";
+import background from "@/assets/bg/backgroud.png";
 
-const Backgroud = () => {
+const Background = () => {
   return (
     <Image
       className="absolute z-10 w-full h-full"
       src={background}
-      alt="Backgroud Register"
+      alt="Background Register"
       layout="fill"
       objectFit="cover"
       quality={100}
@@ -14,4 +14,4 @@ const Backgroud = () => {
   );
 };
 
-export default Backgroud;
+export default Background;

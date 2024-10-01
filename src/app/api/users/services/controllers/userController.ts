@@ -6,10 +6,11 @@ import {
   existingDeleteUser,
   findUser,
   saveToken,
+  updateUserByToken,
 } from "../queries/userQueries";
 import { NextResponse, NextRequest } from "next/server";
 import bcrypt from "bcrypt/";
-import jwt from "jsonwebtoken";
+import { createToken } from "../../../../../middleware/token";
 
 export const getAllUsers = async (req: NextRequest) => {
   const apiKey = req.headers.get("x-api-key");
@@ -74,9 +75,9 @@ export const register = async (req: NextRequest) => {
     return NextResponse.json(
       {
         code: 405,
-        status: "Failed",
-        error: "Method Not Allowed",
-        message: "Only POST method is allowed",
+        status: "failed",
+        message: "the method is wrong",
+        error: "Method not allowed",
       },
       {
         status: 405,
@@ -282,7 +283,15 @@ export const login = async (req: NextRequest) => {
     );
   }
   if (req.method !== "POST") {
-    return NextResponse.json({ error: "Method not allowed" }, { status: 405 });
+    return NextResponse.json(
+      {
+        code: 405,
+        status: "failed",
+        message: "the method is wrong",
+        error: "Method not allowed",
+      },
+      { status: 405 }
+    );
   }
   try {
     const { username, password } = await req.json();
@@ -290,16 +299,26 @@ export const login = async (req: NextRequest) => {
     // Validasi input
     if (!username || !password) {
       return NextResponse.json(
-        { error: "Email and password are required" },
+        {
+          code: 400,
+          status: "failed",
+          message: "Email and password are required",
+          error: "email and password have not been entered",
+        },
         { status: 400 }
       );
     }
 
     // Cari user berdasarkan username
     const user = await findUser({ username });
-    if (!user) {
+    if (!user?.username) {
       return NextResponse.json(
-        { error: "Invalid Username and Password" },
+        {
+          code: 400,
+          status: "failed",
+          message: "Invalid Username or Password",
+          error: "username and password not found",
+        },
         { status: 401 }
       );
     }
@@ -311,21 +330,22 @@ export const login = async (req: NextRequest) => {
     );
     if (!isPasswordValid) {
       return NextResponse.json(
-        { error: "Invalid Username and Password" },
+        {
+          code: 400,
+          status: "failed",
+          message: "Invalid Username or Password",
+          error: "username and password not found",
+        },
         { status: 401 }
       );
     }
 
-    // Buat token unik
-    const token = jwt.sign(
-      {
-        userId: user.id_user,
-        username: user.username,
-        iat: Date.now() / 1000,
-        exp: Math.floor(Date.now() / 1000) + 3, // Token berlaku 1 jam
-      },
-      process.env.NEXT_PUBLIC_JWT_SECRET as string
-    );
+    // created a token
+    const token = createToken({
+      id_user: user.id_user,
+      username: user.username,
+    });
+
     await saveToken({ token, username });
 
     return NextResponse.json(
@@ -342,9 +362,92 @@ export const login = async (req: NextRequest) => {
       { status: 200 }
     );
   } catch (error) {
-    console.error("Login error:", error);
     return NextResponse.json(
-      { error: "An unexpected error occurred" },
+      {
+        code: 500,
+        status: "Error",
+        message: "Internal server error",
+        error,
+      },
+      {
+        status: 500,
+      }
+    );
+  }
+};
+
+export const updatePersonalData = async (req: NextRequest) => {
+  // Check API key
+  const apiKey = req.headers.get("x-api-key");
+  if (apiKey !== process.env.NEXT_PUBLIC_API_KEY) {
+    return NextResponse.json(
+      {
+        code: 401,
+        status: "Failed",
+        error: "Unauthorized",
+        message: "Invalid API key",
+      },
+      { status: 401 }
+    );
+  }
+
+  // Check HTTP method
+  if (req.method !== "PUT") {
+    return NextResponse.json(
+      {
+        code: 405,
+        status: "Failed",
+        message: "The method is wrong",
+        error: "Method not allowed",
+      },
+      { status: 405 }
+    );
+  }
+
+  try {
+    // Get Bearer token from header
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return NextResponse.json(
+        {
+          code: 401,
+          status: "Failed",
+          error: "Unauthorized",
+          message: "Missing or invalid Bearer token",
+        },
+        { status: 401 }
+      );
+    }
+
+    const token = authHeader.split(" ")[1];
+    const { first_name, last_name, address, number_phone } = await req.json();
+
+    // Update user data using the query function
+    await updateUserByToken({
+      first_name,
+      last_name,
+      address,
+      number_phone,
+      token,
+    });
+
+    return NextResponse.json(
+      {
+        code: 200,
+        status: "Success",
+        message: "Personal data updated successfully",
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error updating personal data:", error);
+    return NextResponse.json(
+      {
+        code: 500,
+        status: "Failed",
+        error: "Internal Server Error",
+        message: "An error occurred while updating personal data",
+      },
       { status: 500 }
     );
   }

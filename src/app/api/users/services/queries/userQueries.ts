@@ -69,3 +69,24 @@ export const saveToken = async ({
   });
   return data;
 };
+
+//data diri
+export const updateUserByToken = async ({
+  first_name,
+  last_name,
+  address,
+  number_phone,
+  token,
+}: {
+  first_name: string;
+  last_name: string;
+  address: string;
+  number_phone: string;
+  token: string;
+}) => {
+  const data = await prisma.users.update({
+    where: { token },
+    data: { first_name, last_name, address, number_phone },
+  });
+  return data;
+};
