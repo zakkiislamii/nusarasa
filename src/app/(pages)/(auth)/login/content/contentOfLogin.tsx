@@ -1,13 +1,12 @@
 "use client";
 import React, { useState } from "react";
 import Image from "next/image";
-import usernameIcon from "../../../../../assets/icon/username.png";
-import passwordIcon from "../../../../../assets/icon/password.png";
-import showIcon from "../../../../../assets/icon/show.png";
-import hideIcon from "../../../../../assets/icon/hide.png";
 import { useRouter } from "next/navigation";
 import { handleChange, onSubmit } from "../services";
-import { LoginFormData } from "../interface";
+import { LoginFormData } from "../components";
+import Link from "next/link";
+import { useTogglePassword } from "../components";
+import { icons } from "../components";
 
 const data: LoginFormData = {
   username: "",
@@ -15,13 +14,11 @@ const data: LoginFormData = {
 };
 
 export default function ContentOfLogin(): JSX.Element {
-  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const [formData, setFormData] = useState(data);
 
-  const togglePasswordVisibility = (): void => {
-    setShowPassword((prev) => !prev);
-  };
+  const { showPassword, togglePasswordVisibility } = useTogglePassword();
+  const { iconUsername, iconHide, iconShow, iconPassword } = icons();
 
   return (
     <div className="relative flex-1 p-6 flex justify-center items-center ">
@@ -43,7 +40,7 @@ export default function ContentOfLogin(): JSX.Element {
                 <div className="absolute sm:left-7 left-5 flex items-center">
                   <Image
                     quality={100}
-                    src={usernameIcon}
+                    src={iconUsername}
                     alt="icon username"
                     className="w-5 h-5"
                   />
@@ -65,7 +62,7 @@ export default function ContentOfLogin(): JSX.Element {
                 <div className="absolute sm:left-7 left-5 flex items-center">
                   <Image
                     quality={100}
-                    src={passwordIcon}
+                    src={iconPassword}
                     alt="icon password"
                     className="w-5 h-5"
                   />
@@ -84,7 +81,7 @@ export default function ContentOfLogin(): JSX.Element {
                   className="absolute right-6 justify-center items-center"
                 >
                   <Image
-                    src={showPassword ? hideIcon : showIcon}
+                    src={showPassword ? iconHide : iconShow}
                     alt="Toggle password visibility"
                     className="w-5 h-5"
                   />
@@ -108,7 +105,12 @@ export default function ContentOfLogin(): JSX.Element {
         </button>
         <p className="text-[#554433] pb-10 font-bold">
           Belum punya akun?{" "}
-          <span className="text-[#F4991A]">Register di sini.</span>
+          <Link className="cursor-pointer" href="/register">
+            {" "}
+            <span className="text-[#F4991A] hover:text-[#fdce40]">
+              Login di sini.
+            </span>
+          </Link>
         </p>
       </div>
     </div>

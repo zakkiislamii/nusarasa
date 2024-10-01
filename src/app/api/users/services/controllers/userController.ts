@@ -295,10 +295,13 @@ export const login = async (req: NextRequest) => {
       );
     }
 
-    // Cari user berdasarkan username and password
+    // Cari user berdasarkan username
     const user = await findUser({ username });
     if (!user) {
-      return NextResponse.json({ error: "Invalid Username" }, { status: 401 });
+      return NextResponse.json(
+        { error: "Invalid Username and Password" },
+        { status: 401 }
+      );
     }
 
     // Verifikasi password
@@ -306,7 +309,7 @@ export const login = async (req: NextRequest) => {
       password,
       user.password as string
     );
-    if (!isPasswordValid || !user) {
+    if (!isPasswordValid) {
       return NextResponse.json(
         { error: "Invalid Username and Password" },
         { status: 401 }

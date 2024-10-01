@@ -1,6 +1,8 @@
 import { toast } from "sonner";
 import axios from "axios";
-import { registerFormData } from "../interface";
+import { registerFormData } from "../components";
+
+
 
 export const handleChange = (
   e: React.ChangeEvent<HTMLInputElement>,
@@ -42,3 +44,5 @@ export const onSubmit = async (
     }
   }
 };
+
+

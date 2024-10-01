@@ -1,15 +1,12 @@
 "use client";
 import React, { useState } from "react";
 import Image from "next/image";
-import email from "../../../../../assets/icon/email.png";
-import username from "../../../../../assets/icon/username.png";
-import password from "../../../../../assets/icon/password.png";
-import show from "../../../../../assets/icon/show.png";
-import hide from "../../../../../assets/icon/hide.png";
 import { handleChange, onSubmit } from "../services";
 import { useRouter } from "next/navigation";
-
-import { registerFormData } from "../interface";
+import { useTogglePassword } from "../components";
+import { icons } from "../components";
+import { registerFormData } from "../components";
+import Link from "next/link";
 
 const data: registerFormData = {
   username: "",
@@ -17,19 +14,17 @@ const data: registerFormData = {
   password: "",
   confirm_password: "",
 };
+
 export default function ContentRegister() {
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState(data);
   const router = useRouter();
-
-  const togglePasswordVisibility = () => {
-    setShowPassword((prev) => !prev);
-  };
-
-  const toggleConfirmPasswordVisibility = () => {
-    setShowConfirmPassword((prev) => !prev);
-  };
+  const {
+    showPassword,
+    showConfirmPassword,
+    togglePasswordVisibility,
+    toggleConfirmPasswordVisibility,
+  } = useTogglePassword();
+  const { iconUsername, iconEmail, iconHide, iconShow, iconPassword } = icons();
 
   return (
     <div className="relative flex-1 p-6 flex justify-center items-center ">
@@ -51,7 +46,7 @@ export default function ContentRegister() {
                 <div className="absolute sm:left-7 left-5  flex items-center">
                   <Image
                     quality={100}
-                    src={email}
+                    src={iconEmail}
                     alt="icon email"
                     className="w-5 h-5"
                   />
@@ -73,7 +68,7 @@ export default function ContentRegister() {
                 <div className="absolute sm:left-7 left-5  flex items-center">
                   <Image
                     quality={100}
-                    src={username}
+                    src={iconUsername}
                     alt="icon username"
                     className="w-5 h-5"
                   />
@@ -95,7 +90,7 @@ export default function ContentRegister() {
                 <div className="absolute sm:left-7 left-5 flex items-center">
                   <Image
                     quality={100}
-                    src={password}
+                    src={iconPassword}
                     alt="icon password"
                     className="w-5 h-5"
                   />
@@ -114,7 +109,7 @@ export default function ContentRegister() {
                   className="absolute right-6 justify-center items-center"
                 >
                   <Image
-                    src={showPassword ? hide : show}
+                    src={showPassword ? iconHide : iconShow}
                     alt="Toggle password visibility"
                     className="w-5 h-5"
                   />
@@ -128,7 +123,7 @@ export default function ContentRegister() {
                 <div className="absolute sm:left-7 left-5 flex items-center">
                   <Image
                     quality={100}
-                    src={password}
+                    src={iconPassword}
                     alt="icon confirm password"
                     className="w-5 h-5"
                   />
@@ -147,7 +142,7 @@ export default function ContentRegister() {
                   className="absolute right-6 justify-center items-center"
                 >
                   <Image
-                    src={showConfirmPassword ? hide : show}
+                    src={showConfirmPassword ? iconHide : iconShow}
                     alt="Toggle confirm password visibility"
                     className="w-5 h-5"
                   />
@@ -156,7 +151,7 @@ export default function ContentRegister() {
             </div>
           </div>
 
-          <button className="bg-[#F4991A] w-[25rem] py-3 me-10 ms-10 text-white font-bold rounded-3xl ">
+          <button className="bg-[#F4991A] hover:bg-[#fdce40] w-[25rem] py-3 me-10 ms-10 text-white font-bold rounded-3xl ">
             Register
           </button>
         </form>
@@ -171,7 +166,12 @@ export default function ContentRegister() {
         </button>
         <p className="text-[#554433] pb-10 font-bold">
           Sudah punya akun?{" "}
-          <span className="text-[#F4991A]">Login di sini.</span>
+          <Link className="cursor-pointer" href="/login">
+            {" "}
+            <span className="text-[#F4991A] hover:text-[#fdce40]">
+              Login di sini.
+            </span>
+          </Link>
         </p>
       </div>
     </div>

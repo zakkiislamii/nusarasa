@@ -52,7 +52,7 @@ export const existingDeleteUser = async ({ id }: { id: string }) => {
 };
 
 export const findUser = async ({ username }: { username: string }) => {
-  const data = await prisma.users.findUnique({ where: { username: username } });
+  const data = await prisma.users.findFirst({ where: { username: username } });
   return data;
 };
 

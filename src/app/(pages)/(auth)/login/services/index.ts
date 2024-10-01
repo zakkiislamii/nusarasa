@@ -1,6 +1,6 @@
 import { toast } from "sonner";
 import axios from "axios";
-import { LoginFormData } from "../interface";
+import { LoginFormData } from "../components";
 
 export const handleChange = (
   e: React.ChangeEvent<HTMLInputElement>,
