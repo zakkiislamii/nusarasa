@@ -1,6 +1,7 @@
 import { toast } from "sonner";
 import axios from "axios";
 import { dataDiriFormData } from "../components";
+import { getToken } from "@/utils/token";
 
 export const handleChange = (
   e: React.ChangeEvent<HTMLInputElement>,
@@ -20,19 +21,21 @@ export const onSubmit = async (
   push: (path: string) => void
 ): Promise<void> => {
   e.preventDefault();
+  const token = getToken();
   try {
-    const response = await axios.post("/api/users/register", formData, {
+    const response = await axios.put("/api/users", formData, {
       headers: {
         "Content-Type": "application/json",
         "x-api-key": process.env.NEXT_PUBLIC_API_KEY,
+        Authorization: `Bearer ${token}`,
       },
     });
 
     if (response.data?.error) {
       toast.error(`${response?.data?.message}`);
     } else {
-      toast.success("Registered Successfully");
-      push("/login");
+      toast.success("Personal data entry successful");
+      push("/");
     }
   } catch (error) {
     if (axios.isAxiosError(error)) {

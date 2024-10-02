@@ -23,7 +23,7 @@ export default function ContentDataDiri() {
       <div className=" w-[35rem] max-w-full text-[#F9F5F0] p-5 flex flex-col border border-[#F9F5F0] gap-[50px] relative text-center justify-center items-center z-10 rounded-xl backdrop-blur-md">
         <div className="p-5 font-bold text-4xl">Isi data diri anda!</div>
         <form
-          onSubmit={(e) => onSubmit(e, data, router.push)}
+          onSubmit={(e) => onSubmit(e, formData, router.push)}
           className="w-full max-w-full p-2"
         >
           <div className="w-full flex flex-col gap-5 ">

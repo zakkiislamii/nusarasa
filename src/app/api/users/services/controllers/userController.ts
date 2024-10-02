@@ -10,7 +10,7 @@ import {
 } from "../queries/userQueries";
 import { NextResponse, NextRequest } from "next/server";
 import bcrypt from "bcrypt/";
-import { createToken } from "../../../../../middleware/token";
+import { createToken } from "../../../../../utils/token";
 
 export const getAllUsers = async (req: NextRequest) => {
   const apiKey = req.headers.get("x-api-key");
