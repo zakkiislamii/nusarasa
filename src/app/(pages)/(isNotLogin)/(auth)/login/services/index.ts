@@ -54,18 +54,11 @@ export const onSubmit = async (
 
 export const useIsLogin = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const router = useRouter();
 
   const checkLoginStatus = useCallback(() => {
     const token = getToken();
     setIsLoggedIn(!!token);
   }, []);
-
-  const logout = useCallback(() => {
-    removeToken();
-    setIsLoggedIn(false);
-    router.push("/");
-  }, [router]);
 
   useEffect(() => {
     checkLoginStatus();
@@ -75,7 +68,24 @@ export const useIsLogin = () => {
     };
   }, [checkLoginStatus]);
 
-  return { isLoggedIn, setIsLoggedIn, logout, checkLoginStatus };
+  return { isLoggedIn, setIsLoggedIn, checkLoginStatus };
+};
+
+export const useLogout = () => {
+  const router = useRouter();
+
+  const handleLogout = useCallback(() => {
+    removeToken();
+    localStorage.removeItem("loginState");
+    toast.success("Successfully logged out!");
+    router.push("/");
+
+    setTimeout(() => {
+      window.location.reload();
+    }, 500);
+  }, [router]);
+
+  return handleLogout;
 };
 
 export const useScrollHandler = () => {
@@ -101,15 +111,4 @@ export const useScrollHandler = () => {
   }, []);
 
   return { isScrolling, isScrolled };
-};
-
-export const useLogout = () => {
-  const handleLogout = () => {
-    removeToken();
-    localStorage.removeItem("loginState");
-    toast.success("Successfully logged out!");
-    window.location.reload();
-  };
-
-  return handleLogout;
 };

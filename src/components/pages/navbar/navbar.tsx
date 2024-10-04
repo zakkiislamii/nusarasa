@@ -3,14 +3,12 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import arrow from "@/assets/icon/navbar/arrow.png";
-import userIcon from "@/assets/icon/navbar/profile.png";
 import { NAV_LINKS, IMAGES } from "./components/index";
 import {
   useIsLogin,
   useScrollHandler,
   useLogout,
-} from "@/app/(pages)/(auth)/login/services";
+} from "@/app/(pages)/(isNotLogin)/(auth)/login/services";
 
 const NavBar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -46,7 +44,11 @@ const NavBar = () => {
                 alt={IMAGES.logo.alt}
                 className={IMAGES.logo.className}
               />
-              <Image src={IMAGES.nusarasa.src} alt={IMAGES.nusarasa.alt} />
+              <Image
+                src={IMAGES.nusarasa.src}
+                alt={IMAGES.nusarasa.alt}
+                className={IMAGES.nusarasa.className}
+              />
             </Link>
 
             {["menu", "close"].map((iconType) => (
@@ -68,11 +70,11 @@ const NavBar = () => {
         </div>
 
         <div
-          className={`pe-1 flex flex-col lg:flex-row items-center gap-[3.5vw] text-white z-50 ${
+          className={`pe-1 flex flex-col lg:pt-0 pt-10  lg:flex-row items-center gap-[3.5vw] text-white z-50 ${
             menuOpen ? "block" : "hidden"
           } lg:block`}
         >
-          <ul className="flex text-base flex-col lg:flex-row items-center lg:gap-[4vw] sm:gap-[5vw] gap-[6vw] text-white">
+          <ul className="flex text-base flex-col lg:flex-row items-center  lg:gap-[4vw] sm:gap-[5vw] gap-[6vw] text-white">
             {NAV_LINKS.map(({ href, label }) => (
               <li key={href}>
                 <Link
@@ -89,15 +91,19 @@ const NavBar = () => {
             {isLoggedIn ? (
               <li className="relative">
                 <button
-                  className="flex gap-2 items-center rounded-2xl py-3 px-6"
+                  className="flex gap-3 items-center rounded-2xl py-3 px-6"
                   onClick={toggleDropdown}
                   aria-expanded={dropdownOpen}
                 >
-                  <Image src={userIcon} alt="User Icon" className="w-8 h-8" />
                   <Image
-                    src={arrow}
-                    alt="User Arrow"
-                    className={`transition-transform duration-300 w-8 h-8 ${
+                    src={IMAGES.userIcon.src}
+                    alt={IMAGES.userIcon.alt}
+                    className={IMAGES.userIcon.className}
+                  />
+                  <Image
+                    src={IMAGES.arrow.src}
+                    alt={IMAGES.arrow.alt}
+                    className={`${IMAGES.arrow.className} ${
                       dropdownOpen ? "rotate-180" : ""
                     }`}
                   />
@@ -106,6 +112,14 @@ const NavBar = () => {
                   <div className="absolute text-white left-1/2 transform px-[2px] py-[2px] -translate-x-1/2 mt-2 w-48 rounded-xl z-50 bg-[#F4991A] ">
                     <div className="text-white-Normal font-KronaOne rounded-xl bg-black">
                       <ul className="p-2 text-center">
+                        <li>
+                          <Link
+                            href="/profile"
+                            className="block px-4 py-2 text-white hover:bg-gray-500 mb-2"
+                          >
+                            Profil
+                          </Link>
+                        </li>
                         <li>
                           <Link
                             href="/dashboard"

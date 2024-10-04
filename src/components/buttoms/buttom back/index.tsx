@@ -1,19 +1,24 @@
+"use client";
 import React, { ButtonHTMLAttributes } from "react";
+import { useRouter } from "next/navigation";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
 }
 
-const Button = ({
+const ButtonBack = ({
   className = "",
   disabled,
   children,
   ...props
 }: ButtonProps) => {
+  const router = useRouter();
+
   return (
     <button
-      className={`bg-[#F4991A] hover:bg-[#fdce40] mt-5 w-[80%] max-w-full py-3 text-white font-bold rounded-3xl ${className}`}
+      className={`border-[3px] border-[#F4991A] hover:bg-[#ae8c26] mt-5 w-[80%] max-w-full py-3 text-[#F4991A] font-bold rounded-3xl ${className}`}
       disabled={disabled}
+      onClick={() => router.back()}
       {...props}
     >
       {children}
@@ -21,4 +26,4 @@ const Button = ({
   );
 };
 
-export default Button;
+export default ButtonBack;

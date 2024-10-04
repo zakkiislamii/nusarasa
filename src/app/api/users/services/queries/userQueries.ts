@@ -90,3 +90,69 @@ export const updateUserByToken = async ({
   });
   return data;
 };
+
+export const getProfileById = async ({ token }: { token: string }) => {
+  const data = await prisma.users.findUnique({
+    where: { token: token },
+    select: {
+      first_name: true,
+      last_name: true,
+      username: true,
+      address: true,
+      number_phone: true,
+      email: true,
+    },
+  });
+  return data;
+};
+
+export const editProfileUser = async ({
+  first_name,
+  last_name,
+  address,
+  number_phone,
+  email,
+  username,
+  token,
+}: {
+  first_name: string;
+  last_name: string;
+  address: string;
+  number_phone: string;
+  username: string;
+  email: string;
+  token: string;
+}) => {
+  // First, check if the user exists
+  const existingUser = await prisma.users.findUnique({
+    where: { token },
+  });
+
+  if (!existingUser) {
+    throw new Error("User not found");
+  }
+
+  // Build the update data object conditionally
+  const updateData: Record<string, string> = {
+    first_name,
+    last_name,
+    address,
+    number_phone,
+  };
+
+  // Conditionally update email and username only if they are different
+  if (email !== existingUser.email) {
+    updateData.email = email;
+  }
+  if (username !== existingUser.username) {
+    updateData.username = username;
+  }
+
+  // If user exists, proceed with update
+  const data = await prisma.users.update({
+    where: { token },
+    data: updateData, // Only update the fields that are different
+  });
+
+  return data;
+};

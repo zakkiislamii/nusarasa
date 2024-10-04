@@ -16,7 +16,7 @@ export const createToken = (user: { id_user: string; username: string }) => {
 };
 
 export const saveToken = (token: string) => {
-  const expirationTimeInMinutes = 50; // 5 minutes expiration
+  const expirationTimeInMinutes = 60; // 5 minutes expiration
   const expirationTime = expirationTimeInMinutes * 60 * 1000; // Convert minutes to milliseconds
 
   // Save token to localStorage

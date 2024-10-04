@@ -7,6 +7,8 @@ import {
   findUser,
   saveToken,
   updateUserByToken,
+  getProfileById,
+  editProfileUser,
 } from "../queries/userQueries";
 import { NextResponse, NextRequest } from "next/server";
 import bcrypt from "bcrypt/";
@@ -428,6 +430,158 @@ export const updatePersonalData = async (req: NextRequest) => {
       last_name,
       address,
       number_phone,
+      token,
+    });
+
+    return NextResponse.json(
+      {
+        code: 200,
+        status: "Success",
+        message: "Personal data updated successfully",
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error updating personal data:", error);
+    return NextResponse.json(
+      {
+        code: 500,
+        status: "Failed",
+        error: "Internal Server Error",
+        message: "An error occurred while updating personal data",
+      },
+      { status: 500 }
+    );
+  }
+};
+
+export const getProfile = async (req: NextRequest) => {
+  // Check API key
+  const apiKey = req.headers.get("x-api-key");
+  if (apiKey !== process.env.NEXT_PUBLIC_API_KEY) {
+    return NextResponse.json(
+      {
+        code: 401,
+        status: "Failed",
+        error: "Unauthorized",
+        message: "Invalid API key",
+      },
+      { status: 401 }
+    );
+  }
+
+  // Check HTTP method
+  if (req.method !== "GET") {
+    return NextResponse.json(
+      {
+        code: 405,
+        status: "Failed",
+        message: "The method is wrong",
+        error: "Method not allowed",
+      },
+      { status: 405 }
+    );
+  }
+
+  try {
+    // Get Bearer token from header
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return NextResponse.json(
+        {
+          code: 401,
+          status: "Failed",
+          error: "Unauthorized",
+          message: "Missing or invalid Bearer token",
+        },
+        { status: 401 }
+      );
+    }
+
+    const token = authHeader.split(" ")[1];
+
+    // Update user data using the query function
+    const data = await getProfileById({ token });
+
+    return NextResponse.json(
+      {
+        code: 200,
+        status: "Success",
+        message: "Successfully get user profile!",
+        data,
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error updating personal data:", error);
+    return NextResponse.json(
+      {
+        code: 500,
+        status: "Failed",
+        error: "Internal Server Error",
+        message: "An error occurred while get user profile",
+      },
+      { status: 500 }
+    );
+  }
+};
+
+export const editProfile = async (req: NextRequest) => {
+  // Check API key
+  const apiKey = req.headers.get("x-api-key");
+  if (apiKey !== process.env.NEXT_PUBLIC_API_KEY) {
+    return NextResponse.json(
+      {
+        code: 401,
+        status: "Failed",
+        error: "Unauthorized",
+        message: "Invalid API key",
+      },
+      { status: 401 }
+    );
+  }
+
+  // Check HTTP method
+  if (req.method !== "PUT") {
+    return NextResponse.json(
+      {
+        code: 405,
+        status: "Failed",
+        message: "The method is wrong",
+        error: "Method not allowed",
+      },
+      { status: 405 }
+    );
+  }
+
+  try {
+    // Get Bearer token from header
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return NextResponse.json(
+        {
+          code: 401,
+          status: "Failed",
+          error: "Unauthorized",
+          message: "Missing or invalid Bearer token",
+        },
+        { status: 401 }
+      );
+    }
+
+    const token = authHeader.split(" ")[1];
+    const body = await req.json();
+    const { first_name, last_name, address, number_phone, email, username } =
+      body;
+
+    // Update user data using the query function
+    await editProfileUser({
+      first_name,
+      last_name,
+      address,
+      number_phone,
+      email,
+      username,
       token,
     });
 

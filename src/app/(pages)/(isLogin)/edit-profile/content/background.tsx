@@ -1,5 +1,5 @@
 import Image from "next/image";
-import background from "../../../../assets/bg/backgroud.png";
+import background from "@/assets/bg/backgroud.png";
 
 const Backgroud = () => {
   return (
