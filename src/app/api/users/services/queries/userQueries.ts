@@ -106,6 +106,47 @@ export const getProfileById = async ({ token }: { token: string }) => {
   return data;
 };
 
+export const FindUserBasedOnTheToken = async ({
+  token,
+  email,
+  username,
+}: {
+  token: string;
+  email?: string;
+  username?: string;
+}) => {
+  // Find the user based on the provided token
+  const existingUser = await prisma.users.findUnique({
+    where: { token },
+  });
+
+  if (!existingUser) {
+    throw new Error("User not found");
+  }
+
+  // Check for existing email
+  if (email !== undefined && email !== existingUser.email) {
+    const emailExists = await prisma.users.findUnique({
+      where: { email },
+    });
+    if (emailExists && emailExists.id_user !== existingUser.id_user) {
+      return { exists: true, field: "email" };
+    }
+  }
+
+  // Check for existing username
+  if (username !== undefined && username !== existingUser.username) {
+    const usernameExists = await prisma.users.findUnique({
+      where: { username },
+    });
+    if (usernameExists && usernameExists.id_user !== existingUser.id_user) {
+      return { exists: true, field: "username" };
+    }
+  }
+
+  return { exists: false };
+};
+
 export const editProfileUser = async ({
   first_name,
   last_name,
@@ -115,44 +156,29 @@ export const editProfileUser = async ({
   username,
   token,
 }: {
-  first_name: string;
-  last_name: string;
-  address: string;
-  number_phone: string;
-  username: string;
-  email: string;
+  first_name?: string;
+  last_name?: string;
+  address?: string;
+  number_phone?: string;
+  username?: string;
+  email?: string;
   token: string;
 }) => {
-  // First, check if the user exists
-  const existingUser = await prisma.users.findUnique({
-    where: { token },
-  });
-
-  if (!existingUser) {
-    throw new Error("User not found");
-  }
-
-  // Build the update data object conditionally
-  const updateData: Record<string, string> = {
-    first_name,
-    last_name,
-    address,
-    number_phone,
+  // Build the update data object
+  const updateData = {
+    ...(first_name !== undefined && { first_name }),
+    ...(last_name !== undefined && { last_name }),
+    ...(address !== undefined && { address }),
+    ...(number_phone !== undefined && { number_phone }),
+    ...(email !== undefined && { email }),
+    ...(username !== undefined && { username }),
   };
 
-  // Conditionally update email and username only if they are different
-  if (email !== existingUser.email) {
-    updateData.email = email;
-  }
-  if (username !== existingUser.username) {
-    updateData.username = username;
-  }
-
-  // If user exists, proceed with update
-  const data = await prisma.users.update({
+  // Proceed with the update
+  const updatedUser = await prisma.users.update({
     where: { token },
-    data: updateData, // Only update the fields that are different
+    data: updateData,
   });
 
-  return data;
+  return updatedUser;
 };

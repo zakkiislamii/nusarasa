@@ -1,25 +1,16 @@
 "use client";
 import Image from "next/image";
 import Button from "@/components/buttoms/buttom submit";
-import { editProfileData, IMAGES } from "../components";
+import { IMAGES } from "../components";
 import ButtonBack from "@/components/buttoms/buttom back";
-import { handleChange, onSubmit } from "../services";
+import { useProfileForm, onSubmit } from "../services";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { useProfileData } from "../../profile/services";
 
 export default function ContentEditProfile() {
   const { profileData } = useProfileData();
-  const data: editProfileData = {
-    first_name: profileData.first_name,
-    last_name: profileData.last_name,
-    address: profileData.address,
-    number_phone: profileData.number_phone,
-    email: profileData.email,
-    username: profileData.username,
-  };
   const router = useRouter();
-  const [formData, setFormData] = useState(data);
+  const { formData, handleChange } = useProfileForm(profileData);
 
   return (
     <div className="relative flex-1 p-6 flex justify-center items-center ">
@@ -44,9 +35,9 @@ export default function ContentEditProfile() {
                 </div>
                 <input
                   type="email"
-                  placeholder={profileData.email}
+                  value={formData.email}
                   name="email"
-                  onChange={(e) => handleChange(e, formData, setFormData)}
+                  onChange={handleChange}
                   className="w-full max-w-[488px] h-10 sm:h-[40px] py-2 placeholder-custom-gray pl-12 pr-5 border border-[#F9F5F0] text-[#1E1E1E] rounded-md text-left"
                 />
               </div>
@@ -65,10 +56,10 @@ export default function ContentEditProfile() {
                   />
                 </div>
                 <input
-                  type="username"
-                  placeholder={profileData.username}
+                  type="text"
+                  value={formData.username}
                   name="username"
-                  onChange={(e) => handleChange(e, formData, setFormData)}
+                  onChange={handleChange}
                   className="w-full max-w-[488px] h-10 sm:h-[40px] py-2 placeholder-custom-gray pl-12 pr-5 border border-[#F9F5F0] text-[#1E1E1E] rounded-md text-left"
                 />
               </div>
@@ -87,10 +78,10 @@ export default function ContentEditProfile() {
                   />
                 </div>
                 <input
-                  type="first_name"
-                  placeholder={profileData.first_name}
+                  type="text"
+                  value={formData.first_name}
                   name="first_name"
-                  onChange={(e) => handleChange(e, formData, setFormData)}
+                  onChange={handleChange}
                   className="w-full max-w-[488px] h-10 sm:h-[40px] py-2 placeholder-custom-gray pl-12 pr-5 border border-[#F9F5F0] text-[#1E1E1E] rounded-md text-left"
                 />
               </div>
@@ -109,10 +100,10 @@ export default function ContentEditProfile() {
                   />
                 </div>
                 <input
-                  type="last_name"
-                  placeholder={profileData.last_name}
+                  type="text"
+                  value={formData.last_name}
                   name="last_name"
-                  onChange={(e) => handleChange(e, formData, setFormData)}
+                  onChange={handleChange}
                   className="w-full max-w-[488px] h-10 sm:h-[40px] py-2 placeholder-custom-gray pl-12 pr-5 border border-[#F9F5F0] text-[#1E1E1E] rounded-md text-left"
                 />
               </div>
@@ -131,10 +122,10 @@ export default function ContentEditProfile() {
                   />
                 </div>
                 <input
-                  type="address"
-                  placeholder={profileData.address}
+                  type="text"
+                  value={formData.address}
                   name="address"
-                  onChange={(e) => handleChange(e, formData, setFormData)}
+                  onChange={handleChange}
                   className="w-full max-w-[488px] h-10 sm:h-[40px] py-2 placeholder-custom-gray pl-12 pr-5 border border-[#F9F5F0] text-[#1E1E1E] rounded-md text-left"
                 />
               </div>
@@ -153,10 +144,10 @@ export default function ContentEditProfile() {
                   />
                 </div>
                 <input
-                  type="number_phone"
-                  placeholder={profileData.number_phone}
+                  type="tel"
+                  value={formData.number_phone}
                   name="number_phone"
-                  onChange={(e) => handleChange(e, formData, setFormData)}
+                  onChange={handleChange}
                   className="w-full max-w-[488px] h-10 sm:h-[40px] py-2 placeholder-custom-gray pl-12 pr-5 border border-[#F9F5F0] text-[#1E1E1E] rounded-md text-left"
                 />
               </div>

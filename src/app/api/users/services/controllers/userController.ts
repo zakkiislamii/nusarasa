@@ -9,6 +9,7 @@ import {
   updateUserByToken,
   getProfileById,
   editProfileUser,
+  FindUserBasedOnTheToken,
 } from "../queries/userQueries";
 import { NextResponse, NextRequest } from "next/server";
 import bcrypt from "bcrypt/";
@@ -542,7 +543,7 @@ export const editProfile = async (req: NextRequest) => {
   }
 
   // Check HTTP method
-  if (req.method !== "PUT") {
+  if (req.method !== "POST") {
     return NextResponse.json(
       {
         code: 405,
@@ -573,6 +574,26 @@ export const editProfile = async (req: NextRequest) => {
     const body = await req.json();
     const { first_name, last_name, address, number_phone, email, username } =
       body;
+
+    const validationResult = await FindUserBasedOnTheToken({
+      token,
+      email,
+      username,
+    });
+    if (validationResult.exists) {
+      return NextResponse.json(
+        {
+          code: 409,
+          status: "Failed",
+          message: `${
+            validationResult.field === "email" ? "Email" : "Username"
+          } already exists`,
+        },
+        {
+          status: 409,
+        }
+      );
+    }
 
     // Update user data using the query function
     await editProfileUser({

@@ -2,29 +2,49 @@ import { toast } from "sonner";
 import axios from "axios";
 import { editProfileData } from "../components";
 import { getToken } from "@/utils/token";
+import { useState, useEffect } from "react";
 
-export const handleChange = (
-  e: React.ChangeEvent<HTMLInputElement>,
-  formData: editProfileData,
-  setFormData: React.Dispatch<React.SetStateAction<editProfileData>>
-): void => {
-  const { name, value } = e.target;
-  setFormData({
-    ...formData,
-    [name]: value,
+export const useProfileForm = (initialProfileData: editProfileData) => {
+  const [formData, setFormData] = useState<editProfileData>({
+    first_name: "",
+    last_name: "",
+    address: "",
+    number_phone: "",
+    email: "",
+    username: "",
   });
+
+  useEffect(() => {
+    setFormData({
+      first_name: initialProfileData.first_name || "",
+      last_name: initialProfileData.last_name || "",
+      address: initialProfileData.address || "",
+      number_phone: initialProfileData.number_phone || "",
+      email: initialProfileData.email || "",
+      username: initialProfileData.username || "",
+    });
+  }, [initialProfileData]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  return { formData, handleChange };
 };
 
 export const onSubmit = async (
   e: React.FormEvent<HTMLFormElement>,
   formData: editProfileData,
   push: (path: string) => void,
-  profileData: editProfileData // Pass profileData here
+  profileData: editProfileData
 ): Promise<void> => {
   e.preventDefault();
   const token = getToken();
 
-  // Create a merged version of formData and profileData
   const updatedData: editProfileData = {
     first_name: formData.first_name || profileData.first_name,
     last_name: formData.last_name || profileData.last_name,
@@ -35,7 +55,7 @@ export const onSubmit = async (
   };
 
   try {
-    const response = await axios.put("/api/users/edit-profile", updatedData, {
+    const response = await axios.post("/api/users/edit-profile", updatedData, {
       headers: {
         "Content-Type": "application/json",
         "x-api-key": process.env.NEXT_PUBLIC_API_KEY,
