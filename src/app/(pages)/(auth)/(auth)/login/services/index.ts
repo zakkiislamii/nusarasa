@@ -7,16 +7,23 @@ import { useRouter } from "next/navigation";
 import { useCallback } from "react";
 import { useEffect, useState } from "react";
 
-export const handleChange = (
-  e: React.ChangeEvent<HTMLInputElement>,
-  formData: LoginFormData,
-  setFormData: React.Dispatch<React.SetStateAction<LoginFormData>>
-): void => {
-  const { name, value } = e.target;
-  setFormData({
-    ...formData,
-    [name]: value,
+export const useLoginForm = (
+  initialProfileData: LoginFormData = { username: "", password: "" }
+) => {
+  const [formData, setFormData] = useState<LoginFormData>({
+    username: initialProfileData.username,
+    password: initialProfileData.password,
   });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  return { formData, handleChange };
 };
 
 export const onSubmit = async (

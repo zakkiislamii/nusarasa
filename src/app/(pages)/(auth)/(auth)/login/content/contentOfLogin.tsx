@@ -1,24 +1,16 @@
 "use client";
-import React, { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { handleChange, onSubmit } from "../services";
-import { LoginFormData } from "../components";
+import { onSubmit, useLoginForm } from "../services";
 import Link from "next/link";
 import { useTogglePassword } from "../components";
 import { icons } from "../components";
 import ButtonGoogle from "@/components/buttoms/buttom submit google";
 import Button from "@/components/buttoms/buttom submit";
 
-const data: LoginFormData = {
-  username: "",
-  password: "",
-};
-
 export default function ContentOfLogin(): JSX.Element {
   const router = useRouter();
-  const [formData, setFormData] = useState(data);
-
+  const { formData, handleChange } = useLoginForm();
   const { showPassword, togglePasswordVisibility } = useTogglePassword();
   const { iconUsername, iconHide, iconShow, iconPassword } = icons();
 
@@ -54,7 +46,7 @@ export default function ContentOfLogin(): JSX.Element {
                   type="text"
                   name="username"
                   required
-                  onChange={(e) => handleChange(e, formData, setFormData)}
+                  onChange={handleChange}
                   placeholder="Username"
                   className="w-full max-w-[488px] h-10 sm:h-[40px] py-2 placeholder-custom-gray pl-12 pr-5 border text-[#1E1E1E] rounded-md text-left"
                 />
@@ -76,7 +68,7 @@ export default function ContentOfLogin(): JSX.Element {
                   type={showPassword ? "text" : "password"}
                   placeholder="Password"
                   required
-                  onChange={(e) => handleChange(e, formData, setFormData)}
+                  onChange={handleChange}
                   name="password"
                   className="w-full max-w-[488px] h-10 sm:h-[40px] py-2 placeholder-custom-gray pl-12 pr-12 border text-[#1E1E1E] rounded-md text-left"
                 />

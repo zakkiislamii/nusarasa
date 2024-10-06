@@ -8,7 +8,7 @@ import {
   useIsLogin,
   useScrollHandler,
   useLogout,
-} from "@/app/(pages)/(isNotLogin)/(auth)/login/services";
+} from "@/app/(pages)/(auth)/(auth)/login/services";
 
 const NavBar = () => {
   const [menuOpen, setMenuOpen] = useState(false);

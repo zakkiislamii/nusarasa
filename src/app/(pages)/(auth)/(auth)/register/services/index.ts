@@ -1,17 +1,32 @@
 import { toast } from "sonner";
 import axios from "axios";
 import { registerFormData } from "../components";
+import { useState } from "react";
 
-export const handleChange = (
-  e: React.ChangeEvent<HTMLInputElement>,
-  formData: registerFormData,
-  setFormData: React.Dispatch<React.SetStateAction<registerFormData>>
-): void => {
-  const { name, value } = e.target;
-  setFormData({
-    ...formData,
-    [name]: value,
+export const useRegisterForm = (
+  initialProfileData: registerFormData = {
+    username: "",
+    password: "",
+    email: "",
+    confirm_password: "",
+  }
+) => {
+  const [formData, setFormData] = useState<registerFormData>({
+    username: initialProfileData.username,
+    password: initialProfileData.password,
+    confirm_password: initialProfileData.confirm_password,
+    email: initialProfileData.email,
   });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  return { formData, handleChange };
 };
 
 export const onSubmit = async (

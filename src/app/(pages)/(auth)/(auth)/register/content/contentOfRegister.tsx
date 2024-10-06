@@ -1,24 +1,15 @@
 "use client";
-import React, { useState } from "react";
 import Image from "next/image";
-import { handleChange, onSubmit } from "../services";
+import { onSubmit, useRegisterForm } from "../services";
 import { useRouter } from "next/navigation";
 import { useTogglePassword } from "../components";
 import { icons } from "../components";
-import { registerFormData } from "../components";
 import Link from "next/link";
 import Button from "@/components/buttoms/buttom submit";
 import ButtonGoogle from "@/components/buttoms/buttom submit google";
 
-const data: registerFormData = {
-  username: "",
-  email: "",
-  password: "",
-  confirm_password: "",
-};
-
 export default function ContentRegister() {
-  const [formData, setFormData] = useState(data);
+  const { formData, handleChange } = useRegisterForm();
   const router = useRouter();
   const {
     showPassword,
@@ -60,7 +51,7 @@ export default function ContentRegister() {
                   type="email"
                   placeholder="Email"
                   name="email"
-                  onChange={(e) => handleChange(e, formData, setFormData)}
+                  onChange={handleChange}
                   required
                   className="w-full max-w-[488px] h-10 sm:h-[40px] py-2 placeholder-custom-gray pl-12 pr-5 border text-[#1E1E1E] rounded-md text-left"
                 />
@@ -82,7 +73,7 @@ export default function ContentRegister() {
                   type="username"
                   name="username"
                   required
-                  onChange={(e) => handleChange(e, formData, setFormData)}
+                  onChange={handleChange}
                   placeholder="Username"
                   className="w-full max-w-[488px] h-10 sm:h-[40px] py-2 placeholder-custom-gray pl-12 pr-5 border text-[#1E1E1E] rounded-md text-left"
                 />
@@ -104,7 +95,7 @@ export default function ContentRegister() {
                   type={showPassword ? "text" : "password"}
                   placeholder="Password"
                   required
-                  onChange={(e) => handleChange(e, formData, setFormData)}
+                  onChange={handleChange}
                   name="password"
                   className="w-full max-w-[488px] h-10 sm:h-[40px] py-2 placeholder-custom-gray pl-12 pr-12 border text-[#1E1E1E] rounded-md text-left"
                 />
@@ -138,7 +129,7 @@ export default function ContentRegister() {
                   placeholder="Confirm Password"
                   name="confirm_password"
                   required
-                  onChange={(e) => handleChange(e, formData, setFormData)}
+                  onChange={handleChange}
                   className="w-full max-w-[488px] h-10 sm:h-[40px] py-2 placeholder-custom-gray pl-12 pr-12 border text-[#1E1E1E] rounded-md text-left"
                 />
                 <button
