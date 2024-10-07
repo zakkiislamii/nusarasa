@@ -1,8 +1,7 @@
 import { toast } from "sonner";
 import axios from "axios";
 import { LoginFormData } from "../components";
-import { saveToken } from "@/utils/token";
-import { getToken, removeToken } from "@/utils/token";
+import { saveToken, getToken, removeToken } from "@/utils/token";
 import { useRouter } from "next/navigation";
 import { useCallback } from "react";
 import { useEffect, useState } from "react";

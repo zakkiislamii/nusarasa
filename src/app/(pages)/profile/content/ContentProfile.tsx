@@ -18,7 +18,8 @@ export default function ContentOfProfile() {
     <div className="relative flex-1 p-6 flex justify-center items-center ">
       <div className=" w-[35rem] p-1 max-w-full text-[#554433] flex flex-col border border-black gap-[15px] relative text-center items-center justify-center z-10 rounded-xl bg-[#F9F5F0]">
         <div className="p-5 pt-10 font-bold text-4xl w-full max-w-full ">
-          Halo {profileData.last_name} !
+          Halo {profileData.username}
+          <span className="text-red-500">!!</span>
         </div>
 
         <div className="w-full flex flex-col gap-5 p-5 ">

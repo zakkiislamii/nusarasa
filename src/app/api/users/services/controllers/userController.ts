@@ -13,7 +13,7 @@ import {
 } from "../queries/userQueries";
 import { NextResponse, NextRequest } from "next/server";
 import bcrypt from "bcrypt/";
-import { createToken } from "../../../../../utils/token";
+import { createToken } from "@/utils/token";
 
 export const getAllUsers = async (req: NextRequest) => {
   const apiKey = req.headers.get("x-api-key");
@@ -280,53 +280,50 @@ export const login = async (req: NextRequest) => {
         error: "Unauthorized",
         message: "Invalid API key",
       },
-      {
-        status: 401,
-      }
+      { status: 401 }
     );
   }
+
   if (req.method !== "POST") {
     return NextResponse.json(
       {
         code: 405,
         status: "failed",
-        message: "the method is wrong",
+        message: "The method is wrong",
         error: "Method not allowed",
       },
       { status: 405 }
     );
   }
+
   try {
     const { username, password } = await req.json();
 
-    // Validasi input
     if (!username || !password) {
       return NextResponse.json(
         {
           code: 400,
           status: "failed",
-          message: "Email and password are required",
-          error: "email and password have not been entered",
+          message: "Username and password are required",
+          error: "Username and password have not been entered",
         },
         { status: 400 }
       );
     }
 
-    // Cari user berdasarkan username
     const user = await findUser({ username });
     if (!user?.username) {
       return NextResponse.json(
         {
-          code: 400,
+          code: 401,
           status: "failed",
           message: "Invalid Username or Password",
-          error: "username and password not found",
+          error: "Username and password not found",
         },
         { status: 401 }
       );
     }
 
-    // Verifikasi password
     const isPasswordValid = await bcrypt.compare(
       password,
       user.password as string
@@ -334,24 +331,21 @@ export const login = async (req: NextRequest) => {
     if (!isPasswordValid) {
       return NextResponse.json(
         {
-          code: 400,
+          code: 401,
           status: "failed",
           message: "Invalid Username or Password",
-          error: "username and password not found",
+          error: "Username and password not found",
         },
         { status: 401 }
       );
     }
 
-    // created a token
     const token = createToken({
       id_user: user.id_user,
       username: user.username,
     });
 
-    await saveToken({ token, username });
-
-    return NextResponse.json(
+    const response = NextResponse.json(
       {
         code: 200,
         status: "Success",
@@ -364,17 +358,19 @@ export const login = async (req: NextRequest) => {
       },
       { status: 200 }
     );
+
+    saveToken({ token, username });
+
+    return response;
   } catch (error) {
     return NextResponse.json(
       {
         code: 500,
         status: "Error",
         message: "Internal server error",
-        error,
+        error: error instanceof Error ? error.message : String(error),
       },
-      {
-        status: 500,
-      }
+      { status: 500 }
     );
   }
 };

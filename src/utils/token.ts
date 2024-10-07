@@ -1,6 +1,9 @@
 import jwt from "jsonwebtoken";
+import { NextRequest } from "next/server";
+import Cookies from "js-cookie";
+
 const TOKEN_KEY = "bearerToken";
-const EXPIRATION_KEY = "tokenExpiration";
+const TOKEN_EXPIRATION_TIME = 3 * 60 * 60; //3 jam
 
 export const createToken = (user: { id_user: string; username: string }) => {
   const token = jwt.sign(
@@ -8,43 +11,67 @@ export const createToken = (user: { id_user: string; username: string }) => {
       userId: user.id_user,
       username: user.username,
       iat: Date.now() / 1000,
-      exp: Math.floor(Date.now() / 1000) + 60 * 60,
+      exp: Math.floor(Date.now() / 1000) + TOKEN_EXPIRATION_TIME,
     },
-    process.env.NEXT_PUBLIC_JWT_SECRET as string
+    process.env.JWT_SECRET as string
   );
   return token;
 };
 
-export const saveToken = (token: string) => {
-  const expirationTimeInMinutes = 60; // 5 minutes expiration
-  const expirationTime = expirationTimeInMinutes * 60 * 1000; // Convert minutes to milliseconds
-
-  // Save token to localStorage
-  localStorage.setItem(TOKEN_KEY, token);
-
-  // Set expiration time (current time + 5 minutes)
-  const expirationDate = Date.now() + expirationTime;
-  localStorage.setItem(EXPIRATION_KEY, expirationDate.toString());
-
-  // Schedule token removal after expiration time
-  setTimeout(() => {
-    removeToken();
-  }, expirationTime);
+export const saveToken = (token: string): void => {
+  if (typeof window !== "undefined") {
+    Cookies.set(TOKEN_KEY, token, {
+      expires: TOKEN_EXPIRATION_TIME / (24 * 60 * 12),
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+  }
 };
 
-export const getToken = (): string | null => {
-  const token = localStorage.getItem(TOKEN_KEY);
-  const expiration = localStorage.getItem(EXPIRATION_KEY);
-
-  // Check if token is expired
-  if (expiration && Date.now() > parseInt(expiration)) {
+export const getToken = (req?: NextRequest): string | null => {
+  const removeExpiredToken = () => {
     removeToken();
     return null;
+  };
+
+  if (typeof window !== "undefined") {
+    // Client-side
+    const token = Cookies.get(TOKEN_KEY);
+    if (token) {
+      try {
+        // Verify token expiration
+        const decodedToken = jwt.decode(token) as { exp: number };
+        if (decodedToken.exp < Date.now() / 1000) {
+          return removeExpiredToken();
+        }
+        return token;
+      } catch (error) {
+        console.error("Failed to decode token", error);
+        return removeExpiredToken();
+      }
+    }
+    return null;
+  } else if (req) {
+    // Server-side
+    const token = req.cookies.get(TOKEN_KEY)?.value;
+    if (token) {
+      try {
+        const decodedToken = jwt.decode(token) as { exp: number };
+        if (decodedToken.exp < Date.now() / 1000) {
+          return removeExpiredToken();
+        }
+        return token;
+      } catch {
+        return removeExpiredToken();
+      }
+    }
+    return null;
   }
-  return token;
+  return null;
 };
 
-export const removeToken = () => {
-  localStorage.removeItem(TOKEN_KEY);
-  localStorage.removeItem(EXPIRATION_KEY);
+export const removeToken = (): void => {
+  if (typeof window !== "undefined") {
+    Cookies.remove(TOKEN_KEY, { path: "/" });
+  }
 };
