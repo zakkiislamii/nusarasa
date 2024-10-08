@@ -94,9 +94,7 @@ export default function ContentOfLogin(): JSX.Element {
           <hr className="flex-grow border-t border-black" />
         </div>
 
-        <form action="" className="w-full max-w-full">
-          <ButtonGoogle> Login dengan Google</ButtonGoogle>
-        </form>
+        <ButtonGoogle> Login dengan Google</ButtonGoogle>
 
         <p className="text-[#554433] pb-10 font-bold">
           Belum punya akun?{" "}

@@ -377,6 +377,7 @@ export const login = async (req: NextRequest) => {
 
 export const updatePersonalData = async (req: NextRequest) => {
   // Check API key
+
   const apiKey = req.headers.get("x-api-key");
   if (apiKey !== process.env.NEXT_PUBLIC_API_KEY) {
     return NextResponse.json(
@@ -404,7 +405,6 @@ export const updatePersonalData = async (req: NextRequest) => {
   }
 
   try {
-    // Get Bearer token from header
     const authHeader = req.headers.get("Authorization");
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return NextResponse.json(

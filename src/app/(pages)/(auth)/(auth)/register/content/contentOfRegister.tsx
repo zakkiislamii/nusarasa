@@ -153,9 +153,8 @@ export default function ContentRegister() {
           <span className="mx-4 text-black">Atau</span>
           <hr className="flex-grow border-t border-black" />
         </div>
-        <form action="" className="w-full max-w-full">
-          <ButtonGoogle> Register dengan Google</ButtonGoogle>
-        </form>
+
+        <ButtonGoogle> Register dengan Google</ButtonGoogle>
 
         <p className="text-[#554433] pb-10 font-bold">
           Sudah punya akun?{" "}
