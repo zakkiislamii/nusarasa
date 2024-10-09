@@ -182,3 +182,40 @@ export const editProfileUser = async ({
 
   return updatedUser;
 };
+
+export const saveDataFromGoogle = async ({
+  first_name,
+  last_name,
+  email,
+  username,
+  token,
+}: {
+  first_name?: string;
+  last_name?: string;
+  username?: string;
+  email?: string;
+  token: string;
+}) => {
+  // Use upsert instead of update
+  const upsertedUser = await prisma.users.upsert({
+    where: {
+      // Try to find user by email, as token might not exist in the database
+      email: email || undefined,
+    },
+    create: {
+      first_name,
+      last_name,
+      email,
+      username,
+      token,
+    },
+    update: {
+      first_name,
+      last_name,
+      username, // avoid updating email to prevent conflicts
+      token, // update the token in case it's different
+    },
+  });
+
+  return upsertedUser;
+};
