@@ -5,7 +5,7 @@ import { Rubik } from "next/font/google";
 import dynamic from "next/dynamic";
 import logo from "@/assets/icon/navbar/logo.png";
 import NavBar from "@/components/pages/navbar/navbar";
-//import NextAuthProvider from "@/components/provider/nextauth";
+import NextAuthProvider from "@/components/provider/nextauth";
 
 const ProgressBar = dynamic(() => import("@/components/progress-bar/index"), {
   ssr: false,
@@ -28,11 +28,16 @@ export default function RootLayout({
     <html lang="en">
       <body className={fontStyle.className}>
         <ProgressBar />
-        {/* <NextAuthProvider> */}
-        <Toaster position="top-center" closeButton richColors expand={false} />
-        <NavBar />
-        {children}
-        {/* </NextAuthProvider> */}
+        <NextAuthProvider>
+          <Toaster
+            position="top-center"
+            closeButton
+            richColors
+            expand={false}
+          />
+          <NavBar />
+          {children}
+        </NextAuthProvider>
       </body>
     </html>
   );

@@ -13,7 +13,7 @@ import {
 } from "../queries/userQueries";
 import { NextResponse, NextRequest } from "next/server";
 import bcrypt from "bcrypt/";
-import { encrypt, getSession } from "@/utils/token/token";
+import { encrypt, getSessionForCheck } from "@/utils/token/token";
 
 export const getAllUsers = async (req: NextRequest) => {
   const apiKey = req.headers.get("x-api-key");
@@ -652,7 +652,7 @@ export const logout = async (req: NextRequest) => {
     );
   }
 
-  if (req.method !== "GET") {
+  if (req.method !== "POST") {
     return NextResponse.json(
       {
         code: 405,
@@ -722,42 +722,30 @@ export const checkAuth = async (req: NextRequest) => {
     );
   }
 
-  try {
-    const session = await getSession();
-    if (!session) {
-      return NextResponse.json(
-        {
-          code: 401,
-          status: "failed",
-          message: "Not authenticated",
-          isLoggedIn: false,
-        },
-        { status: 401 }
-      );
-    }
-
+  const session = await getSessionForCheck();
+  if (!session) {
     return NextResponse.json(
       {
-        code: 200,
-        status: "Success",
-        message: "Authenticated",
-        data: {
-          isLoggedIn: true,
-          user: session,
-          session,
-        },
+        code: 401,
+        status: "failed",
+        message: "Not authenticated",
+        isLoggedIn: false,
       },
-      { status: 200 }
-    );
-  } catch (error) {
-    return NextResponse.json(
-      {
-        code: 500,
-        status: "Error",
-        message: "Internal server error",
-        error: error instanceof Error ? error.message : String(error),
-      },
-      { status: 500 }
+      { status: 401 }
     );
   }
+
+  return NextResponse.json(
+    {
+      code: 200,
+      status: "Success",
+      message: "Authenticated",
+      data: {
+        isLoggedIn: true,
+        user: session,
+        session,
+      },
+    },
+    { status: 200 }
+  );
 };

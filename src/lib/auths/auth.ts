@@ -1,49 +1,66 @@
 import { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import { decodeJwt } from "../decode_jwt";
-import getRoleNameByName from "@/utils/get_role";
+import { encrypt } from "@/utils/token/token";
+import { saveToken } from "@/app/api/users/services/queries/userQueries";
+import { cookies } from "next/headers";
 
 export const authConfig: NextAuthOptions = {
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID || "",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
   ],
-  pages: {
-    signIn: "/login",
-  },
-  session: {
-    strategy: "jwt",
-    maxAge: 60 * 60 * 8,
-  },
   callbacks: {
-    async session({ session, token }) {
-      // Pastikan `token` memiliki struktur yang benar sebelum digunakan
-      if (token?.data?.token) {
-        session.user.accessToken = token.data.token;
-        session.user.fullname = token.name as string;
-        const decoded = decodeJwt(session.user.accessToken);
-        session.user.decoded = decoded;
-        session.user.username = decoded?.Role;
-        session.user.role = getRoleNameByName(session.user.username);
+    async signIn({ account, profile }) {
+      if (account && profile) {
+        return true;
       }
-      return session;
+      return false;
     },
+    async jwt({ token, account, profile }) {
+      if (account && profile) {
+        const username =
+          profile.email?.split("@")[0] ||
+          profile.name?.replace(/\s+/g, "").toLowerCase();
+        token.fullname = profile.name;
+        token.email = profile.email;
+        token.username = username;
+        // Add the custom token to the JWT token
+        const customToken = await encrypt({
+          user: {
+            id: profile.sub,
+            username: username,
+            email: profile.email,
+          },
+          expired: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        });
+        token.accessToken = customToken;
 
-    async jwt({ token, user }) {
-      console.log("User in JWT callback:", user);
-      console.log("Token in JWT callback:", token);
-      if (user) {
-        token.id = user.id;
-        token.data = {
-          token: user.accessToken, // Simpan `accessToken` dari user di `token.data.token`
-        }; // Memastikan `data` diisi dengan data user
+        // Save the token
+        await saveToken({
+          token: customToken,
+          username: token.username as string,
+        });
+        cookies().set({
+          name: "session",
+          value: customToken,
+          httpOnly: true,
+          expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // Use `expired` from the correct scope
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "lax",
+        });
       }
 
       return token;
     },
+    async session({ session, token }) {
+      session.user.username = token.username as string;
+      session.user.fullname = token.fullname as string;
+      session.user.email = token.email as string;
+      session.user.accessToken = token.accessToken as string;
+      console.log("ini kontol==> ", session.user.accessToken);
+      return session;
+    },
   },
-
-  debug: process.env.NODE_ENV === "development",
 };

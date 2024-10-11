@@ -40,16 +40,19 @@ export async function getSession() {
   return session;
 }
 
+export async function getSessionForCheck() {
+  const cookieStore = cookies();
+  const session = cookieStore.get(COOKIE_NAME)?.value;
+  if (!session) return null;
+  return decrypt(session);
+}
+
 // For API Routes
 export async function getSessionFromAPI(req: NextRequest) {
-  // Explicitly retrieve the cookie from the RequestCookies object
-  //const cookieStore = cookies(); // Access cookies from the request context
-  const sessionCookie = req.cookies.get(COOKIE_NAME)?.value; // Safely access the session cookie value
-
+  const sessionCookie = req.cookies.get(COOKIE_NAME)?.value;
   if (!sessionCookie) return null; // Return null if no session cookie is found
-
   // Decrypt and return the session token
-  return await decrypt(sessionCookie);
+  return sessionCookie;
 }
 
 // For getServerSideProps

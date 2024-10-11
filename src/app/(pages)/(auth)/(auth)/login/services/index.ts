@@ -24,6 +24,7 @@ export const useLoginForm = (
       [name]: value,
     }));
   };
+
   return { formData, handleChange };
 };
 
@@ -76,7 +77,7 @@ export const useIsLogin = () => {
       setIsLoggedIn(response.data.data.isLoggedIn);
     } catch (error) {
       setIsLoggedIn(false);
-      console.log(error);
+      console.error("Error checking login status:", error);
     }
   }, []);
 
@@ -90,24 +91,30 @@ export const useIsLogin = () => {
 export const useLogout = () => {
   const router = useRouter();
   const { setIsLoggedIn } = useIsLogin();
-  const session = getSession();
 
   const logout = useCallback(async () => {
     try {
-      await axios.get("/api/users/logout", {
-        headers: {
-          "x-api-key": process.env.NEXT_PUBLIC_API_KEY,
-          Authorization: `Bearer ${session}`,
-        },
-      });
+      const session = getSession();
+      if (!session) throw new Error("No session available");
+
+      await axios.post(
+        "/api/users/logout",
+        {},
+        {
+          headers: {
+            "x-api-key": process.env.NEXT_PUBLIC_API_KEY,
+            Authorization: `Bearer ${session}`,
+          },
+        }
+      );
       setIsLoggedIn(false);
       toast.success("Logged out successfully");
       router.push("/");
     } catch (error) {
       toast.error("Failed to logout. Please try again.");
-      console.log(error);
+      console.error("Logout error:", error);
     }
-  }, [router, setIsLoggedIn, session]);
+  }, [router, setIsLoggedIn]);
 
   return logout;
 };

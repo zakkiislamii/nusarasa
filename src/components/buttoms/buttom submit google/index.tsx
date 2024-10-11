@@ -2,32 +2,43 @@
 
 import React, { ButtonHTMLAttributes } from "react";
 import Image from "next/image";
-import { signIn, getSession } from "next-auth/react";
+import { signIn } from "next-auth/react";
 import { toast } from "sonner";
-
 import google from "../../../assets/icon/google.png";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
-  onSuccess?: (email: string, token: string) => void;
+  onSuccess?: () => void;
 }
 
-const ButtonGoogle = ({ className = "", children, ...props }: ButtonProps) => {
+const ButtonGoogle = ({
+  className = "",
+  children,
+  onSuccess,
+  ...props
+}: ButtonProps) => {
   const handleClick = async () => {
     try {
-      const result = await signIn("google");
+      const result = await signIn("google", {
+        callbackUrl: "/",
+        redirect: false,
+      });
 
       if (result?.error) {
         console.error("Sign in error:", result.error);
-        toast.error(`Gagal masuk dengan Google: ${result.error}`);
+        toast.error(`Failed to sign in with Google: ${result.error}`);
         return;
       }
-      const session = await getSession();
-      console.log(session);
-      console.log(1);
+
+      if (result?.ok) {
+        toast.success("Successfully signed in!");
+        if (onSuccess) {
+          onSuccess();
+        }
+      }
     } catch (error) {
       console.error("Unexpected error during sign in:", error);
-      toast.error("Terjadi kesalahan saat mencoba masuk dengan Google");
+      toast.error("An error occurred while trying to sign in with Google.");
     }
   };
 
