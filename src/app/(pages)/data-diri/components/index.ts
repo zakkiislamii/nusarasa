@@ -11,8 +11,7 @@ export const icons = () => {
 };
 
 export interface dataDiriFormData {
-  first_name: string;
-  last_name: string;
+  fullname: string;
   address: string;
   number_phone: string;
 }

@@ -1,7 +1,16 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { PrismaClient } from "@prisma/client";
 
-const prisma = new PrismaClient();
+let prisma: PrismaClient;
 
+if (process.env.NODE_ENV === "production") {
+  prisma = new PrismaClient();
+} else {
+  if (!(global as any).prisma) {
+    (global as any).prisma = new PrismaClient();
+  }
+  prisma = (global as any).prisma;
+}
 // getAll
 export const findManyUsers = async () => {
   return await prisma.users.findMany({});
@@ -72,21 +81,19 @@ export const saveToken = async ({
 
 //data diri
 export const updateUserByToken = async ({
-  first_name,
-  last_name,
+  fullname,
   address,
   number_phone,
   token,
 }: {
-  first_name: string;
-  last_name: string;
+  fullname: string;
   address: string;
   number_phone: string;
   token: string;
 }) => {
   const data = await prisma.users.update({
     where: { token },
-    data: { first_name, last_name, address, number_phone },
+    data: { fullname, address, number_phone },
   });
   return data;
 };
@@ -95,8 +102,7 @@ export const getProfileById = async ({ token }: { token: string }) => {
   const data = await prisma.users.findUnique({
     where: { token: token },
     select: {
-      first_name: true,
-      last_name: true,
+      fullname: true,
       username: true,
       address: true,
       number_phone: true,
@@ -148,16 +154,15 @@ export const FindUserBasedOnTheToken = async ({
 };
 
 export const editProfileUser = async ({
-  first_name,
-  last_name,
+  fullname,
   address,
   number_phone,
   email,
   username,
   token,
 }: {
-  first_name?: string;
-  last_name?: string;
+  fullname?: string;
+
   address?: string;
   number_phone?: string;
   username?: string;
@@ -166,8 +171,7 @@ export const editProfileUser = async ({
 }) => {
   // Build the update data object
   const updateData = {
-    ...(first_name !== undefined && { first_name }),
-    ...(last_name !== undefined && { last_name }),
+    ...(fullname !== undefined && { fullname }),
     ...(address !== undefined && { address }),
     ...(number_phone !== undefined && { number_phone }),
     ...(email !== undefined && { email }),
@@ -183,39 +187,33 @@ export const editProfileUser = async ({
   return updatedUser;
 };
 
-export const saveDataFromGoogle = async ({
-  first_name,
-  last_name,
+export async function saveDataFromGoogle({
+  fullname,
   email,
   username,
   token,
+  id_user,
 }: {
-  first_name?: string;
-  last_name?: string;
+  fullname?: string;
   username?: string;
   email?: string;
   token: string;
-}) => {
-  // Use upsert instead of update
-  const upsertedUser = await prisma.users.upsert({
-    where: {
-      // Try to find user by email, as token might not exist in the database
-      email: email || undefined,
-    },
-    create: {
-      first_name,
-      last_name,
-      email,
-      username,
-      token,
-    },
-    update: {
-      first_name,
-      last_name,
-      username, // avoid updating email to prevent conflicts
-      token, // update the token in case it's different
-    },
-  });
+  id_user: string;
+}) {
+  if (!email) {
+    throw new Error("Email is required to save user data.");
+  }
 
-  return upsertedUser;
-};
+  try {
+    const upsertedUser = await prisma.users.upsert({
+      where: { email },
+      create: { fullname, email, username, token, id_user },
+      update: { fullname, username, token, id_user },
+    });
+
+    return upsertedUser;
+  } catch (error) {
+    console.error("Error saving user data:", error);
+    throw error;
+  }
+}

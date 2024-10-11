@@ -1,10 +1,13 @@
 import { toast } from "sonner";
 import axios from "axios";
-import { LoginFormData } from "../components";
-import { saveToken, getToken, removeToken } from "@/utils/token";
 import { useRouter } from "next/navigation";
-import { useCallback } from "react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { getSession } from "@/utils/token/token";
+
+export interface LoginFormData {
+  username: string;
+  password: string;
+}
 
 export const useLoginForm = (
   initialProfileData: LoginFormData = { username: "", password: "" }
@@ -24,53 +27,61 @@ export const useLoginForm = (
   return { formData, handleChange };
 };
 
-export const onSubmit = async (
-  e: React.FormEvent<HTMLFormElement>,
-  formData: LoginFormData,
-  push: (path: string) => void
-): Promise<void> => {
-  e.preventDefault();
-  try {
-    const response = await axios.post("/api/users/login", formData, {
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": process.env.NEXT_PUBLIC_API_KEY,
-      },
-    });
+export const useLogin = () => {
+  const router = useRouter();
+  const { setIsLoggedIn } = useIsLogin();
 
-    const bearerToken = response.data.data?.token;
-    saveToken(bearerToken);
+  const onSubmit = async (
+    e: React.FormEvent<HTMLFormElement>,
+    formData: LoginFormData
+  ): Promise<void> => {
+    e.preventDefault();
+    try {
+      const response = await axios.post("/api/users/login", formData, {
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.NEXT_PUBLIC_API_KEY,
+        },
+      });
 
-    if (response.data?.error) {
-      toast.error(`${response?.data?.message}`);
-    } else {
-      localStorage.setItem("loginState", "true");
-      toast.success("Login Successful");
-      push("/data-diri");
+      if (response.data?.error) {
+        toast.error(`${response?.data?.message}`);
+      } else {
+        setIsLoggedIn(true);
+        toast.success("Login Successful");
+        router.push("/data-diri");
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        toast.error(`${error.response?.data?.message}`);
+      } else {
+        toast.error("An unexpected error occurred. Please try again.");
+      }
     }
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      toast.error(`${error.response?.data?.message}`);
-    } else {
-      toast.error("An unexpected error occurred. Please try again.");
-    }
-  }
+  };
+
+  return { onSubmit };
 };
 
 export const useIsLogin = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  const checkLoginStatus = useCallback(() => {
-    const token = getToken();
-    setIsLoggedIn(!!token);
+  const checkLoginStatus = useCallback(async () => {
+    try {
+      const response = await axios.get("/api/users/checkAuth", {
+        headers: {
+          "x-api-key": process.env.NEXT_PUBLIC_API_KEY,
+        },
+      });
+      setIsLoggedIn(response.data.data.isLoggedIn);
+    } catch (error) {
+      setIsLoggedIn(false);
+      console.log(error);
+    }
   }, []);
 
   useEffect(() => {
     checkLoginStatus();
-    window.addEventListener("storage", checkLoginStatus);
-    return () => {
-      window.removeEventListener("storage", checkLoginStatus);
-    };
   }, [checkLoginStatus]);
 
   return { isLoggedIn, setIsLoggedIn, checkLoginStatus };
@@ -78,19 +89,27 @@ export const useIsLogin = () => {
 
 export const useLogout = () => {
   const router = useRouter();
+  const { setIsLoggedIn } = useIsLogin();
+  const session = getSession();
 
-  const handleLogout = useCallback(() => {
-    removeToken();
-    localStorage.removeItem("loginState");
-    toast.success("Successfully logged out!");
-    router.push("/");
+  const logout = useCallback(async () => {
+    try {
+      await axios.get("/api/users/logout", {
+        headers: {
+          "x-api-key": process.env.NEXT_PUBLIC_API_KEY,
+          Authorization: `Bearer ${session}`,
+        },
+      });
+      setIsLoggedIn(false);
+      toast.success("Logged out successfully");
+      router.push("/");
+    } catch (error) {
+      toast.error("Failed to logout. Please try again.");
+      console.log(error);
+    }
+  }, [router, setIsLoggedIn, session]);
 
-    setTimeout(() => {
-      window.location.reload();
-    }, 500);
-  }, [router]);
-
-  return handleLogout;
+  return logout;
 };
 
 export const useScrollHandler = () => {

@@ -13,8 +13,7 @@ export const IMAGES = {
 };
 
 export interface editProfileData {
-  first_name: string;
-  last_name: string;
+  fullname: string;
   address: string;
   number_phone: string;
   email: string;

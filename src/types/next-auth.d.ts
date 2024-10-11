@@ -1,23 +1,33 @@
-import { JWT } from "next-auth/jwt";
+import { JwtPayload } from "./jwt";
+import { RoleType } from "./role";
 
 declare module "next-auth" {
   interface Session {
     user: {
+      id_user: string;
       username?: string;
-      firstName?: string;
-      lastName?: string;
-      email?: string;
+      fullname?: string;
       accessToken?: string;
-    } & JWT["user"];
+      decoded?: JwtPayload;
+      role?: RoleType;
+    };
+  }
+
+  interface DefaultUser {
+    username: string;
+    fullname: string;
+    accessToken: string;
   }
 }
 
 declare module "next-auth/jwt" {
   interface JWT {
-    username?: string;
-    firstName?: string;
-    lastName?: string;
-    email?: string;
-    accessToken?: string;
+    code: number;
+    id: string;
+    status: string;
+    message: string;
+    data: {
+      token: string;
+    };
   }
 }

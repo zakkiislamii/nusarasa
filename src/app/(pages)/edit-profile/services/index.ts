@@ -1,13 +1,12 @@
 import { toast } from "sonner";
 import axios from "axios";
 import { editProfileData } from "../components";
-import { getToken } from "@/utils/token";
 import { useState, useEffect } from "react";
+import { getSession } from "@/utils/token/token";
 
 export const useProfileForm = (initialProfileData: editProfileData) => {
   const [formData, setFormData] = useState<editProfileData>({
-    first_name: "",
-    last_name: "",
+    fullname: "",
     address: "",
     number_phone: "",
     email: "",
@@ -16,8 +15,7 @@ export const useProfileForm = (initialProfileData: editProfileData) => {
 
   useEffect(() => {
     setFormData({
-      first_name: initialProfileData.first_name || "",
-      last_name: initialProfileData.last_name || "",
+      fullname: initialProfileData.fullname || "",
       address: initialProfileData.address || "",
       number_phone: initialProfileData.number_phone || "",
       email: initialProfileData.email || "",
@@ -43,11 +41,10 @@ export const onSubmit = async (
   profileData: editProfileData
 ): Promise<void> => {
   e.preventDefault();
-  const token = getToken();
+  const token = await getSession();
 
   const updatedData: editProfileData = {
-    first_name: formData.first_name || profileData.first_name,
-    last_name: formData.last_name || profileData.last_name,
+    fullname: formData.fullname || profileData.fullname,
     address: formData.address || profileData.address,
     number_phone: formData.number_phone || profileData.number_phone,
     email: formData.email || profileData.email,

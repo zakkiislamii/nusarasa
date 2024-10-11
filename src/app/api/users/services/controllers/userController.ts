@@ -5,15 +5,15 @@ import {
   deleterUserById,
   existingDeleteUser,
   findUser,
-  saveToken,
   updateUserByToken,
   getProfileById,
   editProfileUser,
   FindUserBasedOnTheToken,
+  saveToken,
 } from "../queries/userQueries";
 import { NextResponse, NextRequest } from "next/server";
 import bcrypt from "bcrypt/";
-import { createToken } from "@/utils/token";
+import { encrypt, getSession } from "@/utils/token/token";
 
 export const getAllUsers = async (req: NextRequest) => {
   const apiKey = req.headers.get("x-api-key");
@@ -340,10 +340,20 @@ export const login = async (req: NextRequest) => {
       );
     }
 
-    const token = createToken({
-      id_user: user.id_user,
-      username: user.username,
+    // Declare `expired` before using it
+    const expired = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+    // Create a session before using it
+    const session = await encrypt({
+      user: {
+        id: user.id_user,
+        username: user.username,
+        email: user.email,
+      },
+      expired,
     });
+
+    await saveToken({ token: session, username });
 
     const response = NextResponse.json(
       {
@@ -353,13 +363,21 @@ export const login = async (req: NextRequest) => {
         data: {
           email: user.email,
           username: user.username,
-          token,
+          session,
         },
       },
       { status: 200 }
     );
 
-    saveToken({ token, username });
+    // Set the session cookie
+    response.cookies.set({
+      name: "session",
+      value: session,
+      httpOnly: true,
+      expires: expired, // Use `expired` from the correct scope
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    });
 
     return response;
   } catch (error) {
@@ -377,7 +395,6 @@ export const login = async (req: NextRequest) => {
 
 export const updatePersonalData = async (req: NextRequest) => {
   // Check API key
-
   const apiKey = req.headers.get("x-api-key");
   if (apiKey !== process.env.NEXT_PUBLIC_API_KEY) {
     return NextResponse.json(
@@ -419,12 +436,13 @@ export const updatePersonalData = async (req: NextRequest) => {
     }
 
     const token = authHeader.split(" ")[1];
-    const { first_name, last_name, address, number_phone } = await req.json();
 
-    // Update user data using the query function
+    // Parse the request body
+    const { fullname, address, number_phone } = await req.json();
+
+    // Update user data using the query function (replace with your logic)
     await updateUserByToken({
-      first_name,
-      last_name,
+      fullname,
       address,
       number_phone,
       token,
@@ -444,7 +462,7 @@ export const updatePersonalData = async (req: NextRequest) => {
       {
         code: 500,
         status: "Failed",
-        error: "Internal Server Error",
+        error: error,
         message: "An error occurred while updating personal data",
       },
       { status: 500 }
@@ -568,8 +586,7 @@ export const editProfile = async (req: NextRequest) => {
 
     const token = authHeader.split(" ")[1];
     const body = await req.json();
-    const { first_name, last_name, address, number_phone, email, username } =
-      body;
+    const { fullname, address, number_phone, email, username } = body;
 
     const validationResult = await FindUserBasedOnTheToken({
       token,
@@ -591,10 +608,8 @@ export const editProfile = async (req: NextRequest) => {
       );
     }
 
-    // Update user data using the query function
     await editProfileUser({
-      first_name,
-      last_name,
+      fullname,
       address,
       number_phone,
       email,
@@ -618,6 +633,129 @@ export const editProfile = async (req: NextRequest) => {
         status: "Failed",
         error: "Internal Server Error",
         message: "An error occurred while updating personal data",
+      },
+      { status: 500 }
+    );
+  }
+};
+export const logout = async (req: NextRequest) => {
+  const apiKey = req.headers.get("x-api-key");
+  if (apiKey !== process.env.NEXT_PUBLIC_API_KEY) {
+    return NextResponse.json(
+      {
+        code: 401,
+        status: "Failed",
+        error: "Unauthorized",
+        message: "Invalid API key",
+      },
+      { status: 401 }
+    );
+  }
+
+  if (req.method !== "GET") {
+    return NextResponse.json(
+      {
+        code: 405,
+        status: "failed",
+        message: "Method not allowed",
+        error: "The method is wrong",
+      },
+      { status: 405 }
+    );
+  }
+  // Get Bearer token from header
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return NextResponse.json(
+      {
+        code: 401,
+        status: "Failed",
+        error: "Unauthorized",
+        message: "Missing or invalid Bearer token",
+      },
+      { status: 401 }
+    );
+  }
+  const response = NextResponse.json(
+    {
+      code: 200,
+      status: "Success",
+      message: "Logged out successfully",
+    },
+    { status: 200 }
+  );
+
+  response.cookies.set({
+    name: "session",
+    value: "",
+    expires: new Date(0),
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+  });
+
+  return response;
+};
+
+export const checkAuth = async (req: NextRequest) => {
+  const apiKey = req.headers.get("x-api-key");
+  if (apiKey !== process.env.NEXT_PUBLIC_API_KEY) {
+    return NextResponse.json(
+      {
+        code: 401,
+        status: "Failed",
+        error: "Unauthorized",
+        message: "Invalid API key",
+      },
+      { status: 401 }
+    );
+  }
+  if (req.method !== "GET") {
+    return NextResponse.json(
+      {
+        code: 405,
+        status: "failed",
+        message: "Method not allowed",
+        error: "The method is wrong",
+      },
+      { status: 405 }
+    );
+  }
+
+  try {
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json(
+        {
+          code: 401,
+          status: "failed",
+          message: "Not authenticated",
+          isLoggedIn: false,
+        },
+        { status: 401 }
+      );
+    }
+
+    return NextResponse.json(
+      {
+        code: 200,
+        status: "Success",
+        message: "Authenticated",
+        data: {
+          isLoggedIn: true,
+          user: session,
+          session,
+        },
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    return NextResponse.json(
+      {
+        code: 500,
+        status: "Error",
+        message: "Internal server error",
+        error: error instanceof Error ? error.message : String(error),
       },
       { status: 500 }
     );

@@ -1,7 +1,7 @@
 import { toast } from "sonner";
 import axios from "axios";
 import { dataDiriFormData } from "../components";
-import { getToken } from "@/utils/token";
+import { getSession } from "@/utils/token/token";
 
 export const handleChange = (
   e: React.ChangeEvent<HTMLInputElement>,
@@ -21,7 +21,7 @@ export const onSubmit = async (
   push: (path: string) => void
 ): Promise<void> => {
   e.preventDefault();
-  const token = getToken();
+  const token = await getSession();
   try {
     const response = await axios.put("/api/users", formData, {
       headers: {
@@ -41,6 +41,7 @@ export const onSubmit = async (
     if (axios.isAxiosError(error)) {
       toast.error(`${error.response?.data?.message}`);
     } else {
+      console.log(error);
       toast.error("An unexpected error occurred. Please try again.");
     }
   }

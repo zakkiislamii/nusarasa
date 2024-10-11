@@ -1,7 +1,6 @@
 "use client";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { onSubmit, useLoginForm } from "../services";
+import { useLoginForm, useLogin } from "../services";
 import Link from "next/link";
 import { useTogglePassword } from "../components";
 import { icons } from "../components";
@@ -9,7 +8,7 @@ import ButtonGoogle from "@/components/buttoms/buttom submit google";
 import Button from "@/components/buttoms/buttom submit";
 
 export default function ContentOfLogin(): JSX.Element {
-  const router = useRouter();
+  const { onSubmit } = useLogin();
   const { formData, handleChange } = useLoginForm();
   const { showPassword, togglePasswordVisibility } = useTogglePassword();
   const { iconUsername, iconHide, iconShow, iconPassword } = icons();
@@ -19,7 +18,7 @@ export default function ContentOfLogin(): JSX.Element {
       <div className=" w-[35rem] p-1 max-w-full text-[#554433] flex flex-col border border-black gap-[15px] relative text-center items-center justify-center z-10 rounded-xl bg-[#F9F5F0]">
         <div className="p-5 pt-10 font-bold text-4xl">Selamat Datang!</div>
         <form
-          onSubmit={(e) => onSubmit(e, formData, router.push)}
+          onSubmit={(e) => onSubmit(e, formData)}
           className="w-full max-w-full p-2"
         >
           <div className="w-full flex flex-col gap-5 p-5">

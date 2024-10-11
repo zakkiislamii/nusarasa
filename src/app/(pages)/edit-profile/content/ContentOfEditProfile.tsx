@@ -65,9 +65,9 @@ export default function ContentEditProfile() {
               </div>
             </div>
 
-            {/* First Name */}
+            {/* Full Name */}
             <div className="flex flex-col gap-3 sm:gap-4 text-start">
-              <p className="font-bold">First Name</p>
+              <p className="font-bold">Full Name</p>
               <div className="relative flex justify-center items-center text-[#1E1E1E]">
                 <div className="absolute sm:left-6 left-5 flex items-center">
                   <Image
@@ -79,30 +79,8 @@ export default function ContentEditProfile() {
                 </div>
                 <input
                   type="text"
-                  value={formData.first_name}
-                  name="first_name"
-                  onChange={handleChange}
-                  className="w-full max-w-[488px] h-10 sm:h-[40px] py-2 placeholder-custom-gray pl-12 pr-5 border border-[#F9F5F0] text-[#1E1E1E] rounded-md text-left"
-                />
-              </div>
-            </div>
-
-            {/* Last Name */}
-            <div className="flex flex-col gap-3 sm:gap-4 text-start">
-              <p className="font-bold">Last Name</p>
-              <div className="relative flex justify-center items-center text-[#1E1E1E]">
-                <div className="absolute sm:left-6 left-5 flex items-center">
-                  <Image
-                    quality={100}
-                    src={IMAGES.nameIcon.src}
-                    alt={IMAGES.nameIcon.alt}
-                    className={IMAGES.nameIcon.className}
-                  />
-                </div>
-                <input
-                  type="text"
-                  value={formData.last_name}
-                  name="last_name"
+                  value={formData.fullname}
+                  name="fullname"
                   onChange={handleChange}
                   className="w-full max-w-[488px] h-10 sm:h-[40px] py-2 placeholder-custom-gray pl-12 pr-5 border border-[#F9F5F0] text-[#1E1E1E] rounded-md text-left"
                 />

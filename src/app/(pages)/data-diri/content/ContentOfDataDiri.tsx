@@ -8,8 +8,7 @@ import { useState } from "react";
 import Button from "@/components/buttoms/buttom submit";
 
 const data: dataDiriFormData = {
-  first_name: "",
-  last_name: "",
+  fullname: "",
   address: "",
   number_phone: "",
 };
@@ -35,7 +34,7 @@ export default function ContentDataDiri() {
                 `}
             </style>
 
-            {/* First Name */}
+            {/* Full Name */}
             <div className="flex flex-col gap-3 sm:gap-4">
               <div className="relative flex justify-center items-center text-[#1E1E1E]">
                 <div className="absolute sm:left-4 left-5  flex items-center">
@@ -47,34 +46,12 @@ export default function ContentDataDiri() {
                   />
                 </div>
                 <input
-                  type="first_name"
-                  placeholder="First Name"
-                  name="first_name"
+                  type="fullname"
+                  placeholder="Full Name"
+                  name="fullname"
                   onChange={(e) => handleChange(e, formData, setFormData)}
                   required
                   className="w-full max-w-[488px] h-10 sm:h-[40px] py-2 placeholder-custom-gray pl-12 pr-5 border border-[#F9F5F0] text-[#1E1E1E] rounded-md text-left"
-                />
-              </div>
-            </div>
-
-            {/* Last Name */}
-            <div className="flex flex-col gap-3 sm:gap-4">
-              <div className="relative flex justify-center items-center text-[#1E1E1E]">
-                <div className="absolute sm:left-4 left-5  flex items-center">
-                  <Image
-                    quality={100}
-                    src={iconName}
-                    alt="icon username"
-                    className="w-5 h-5"
-                  />
-                </div>
-                <input
-                  type="last_name"
-                  name="last_name"
-                  required
-                  onChange={(e) => handleChange(e, formData, setFormData)}
-                  placeholder="Last Name"
-                  className="w-full max-w-[488px] h-10 sm:h-[40px] py-2 placeholder-custom-gray pl-12 pr-5 border text-[#1E1E1E] rounded-md text-left"
                 />
               </div>
             </div>
