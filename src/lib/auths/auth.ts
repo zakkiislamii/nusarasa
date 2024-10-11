@@ -26,7 +26,7 @@ export const authConfig: NextAuthOptions = {
         token.fullname = profile.name;
         token.email = profile.email;
         token.username = username;
-        // Add the custom token to the JWT token
+
         const customToken = await encrypt({
           user: {
             id: profile.sub,
@@ -36,8 +36,6 @@ export const authConfig: NextAuthOptions = {
           expired: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
         });
         token.accessToken = customToken;
-
-        // Save the token
         await saveToken({
           token: customToken,
           username: token.username as string,
@@ -46,7 +44,7 @@ export const authConfig: NextAuthOptions = {
           name: "session",
           value: customToken,
           httpOnly: true,
-          expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // Use `expired` from the correct scope
+          expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
           secure: process.env.NODE_ENV === "production",
           sameSite: "lax",
         });
@@ -59,7 +57,6 @@ export const authConfig: NextAuthOptions = {
       session.user.fullname = token.fullname as string;
       session.user.email = token.email as string;
       session.user.accessToken = token.accessToken as string;
-      console.log("ini kontol==> ", session.user.accessToken);
       return session;
     },
   },

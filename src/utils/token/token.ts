@@ -32,7 +32,6 @@ export async function decrypt(input: string): Promise<any> {
   }
 }
 
-// For use in Server Components or API Route Handlers
 export async function getSession() {
   const cookieStore = cookies();
   const session = cookieStore.get(COOKIE_NAME)?.value;
@@ -47,11 +46,9 @@ export async function getSessionForCheck() {
   return decrypt(session);
 }
 
-// For API Routes
 export async function getSessionFromAPI(req: NextRequest) {
   const sessionCookie = req.cookies.get(COOKIE_NAME)?.value;
-  if (!sessionCookie) return null; // Return null if no session cookie is found
-  // Decrypt and return the session token
+  if (!sessionCookie) return null;
   return sessionCookie;
 }
 
@@ -66,7 +63,7 @@ export async function getSessionFromServerSideProps(
 
 // Helper to set cookie in API response
 export async function setSessionCookie(res: NextApiResponse, token: string) {
-  const oneWeek = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
+  const oneWeek = 7 * 24 * 60 * 60 * 1000; 
   const expires = new Date(Date.now() + oneWeek);
 
   res.setHeader(

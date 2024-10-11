@@ -31,6 +31,7 @@ export const useLoginForm = (
 export const useLogin = () => {
   const router = useRouter();
   const { setIsLoggedIn } = useIsLogin();
+  const [loading, setLoading] = useState(false);
 
   const onSubmit = async (
     e: React.FormEvent<HTMLFormElement>,
@@ -38,6 +39,7 @@ export const useLogin = () => {
   ): Promise<void> => {
     e.preventDefault();
     try {
+      setLoading(true);
       const response = await axios.post("/api/users/login", formData, {
         headers: {
           "Content-Type": "application/json",
@@ -58,10 +60,12 @@ export const useLogin = () => {
       } else {
         toast.error("An unexpected error occurred. Please try again.");
       }
+    } finally {
+      setLoading(false);
     }
   };
 
-  return { onSubmit };
+  return { onSubmit, loading };
 };
 
 export const useIsLogin = () => {

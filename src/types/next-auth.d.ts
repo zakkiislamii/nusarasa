@@ -1,5 +1,4 @@
 import { JWT } from "next-auth/jwt";
-// Extend NextAuth types
 declare module "next-auth" {
   interface Session {
     user: {

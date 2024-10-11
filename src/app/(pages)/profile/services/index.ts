@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { useState, useEffect } from "react";
 import { getSession } from "@/utils/token/token";
 
+// Get profile user data
 export const getProfileUser = async () => {
   const token = await getSession();
   try {
@@ -30,12 +31,13 @@ export const getProfileUser = async () => {
     if (axios.isAxiosError(error)) {
       toast.error(`${error.response?.data?.message}`);
     } else {
-      toast.error("null");
+      toast.error("An unexpected error occurred. Please try again.");
     }
     return null;
   }
 };
 
+// Custom hook to fetch and manage profile data
 export const useProfileData = () => {
   const [profileData, setProfileData] = useState({
     email: "",
@@ -44,9 +46,11 @@ export const useProfileData = () => {
     address: "",
     number_phone: "",
   });
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchProfileData = async () => {
+      setLoading(true);
       try {
         const data = await getProfileUser();
         if (data) {
@@ -58,11 +62,13 @@ export const useProfileData = () => {
         } else {
           toast.error("An unexpected error occurred. Please try again.");
         }
-        return null;
+      } finally {
+        setLoading(false);
       }
     };
+
     fetchProfileData();
   }, []);
 
-  return { profileData };
+  return { profileData, loading };
 };
