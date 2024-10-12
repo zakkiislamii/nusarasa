@@ -10,8 +10,7 @@ export default function loginWithGoogle() {
       });
 
       if (result?.error) {
-        console.error("Sign in error:", result.error);
-        toast.error(`Failed to sign in with Google: ${result.error}`);
+        toast.error(`${result.error}`);
         return;
       }
 
@@ -22,11 +21,9 @@ export default function loginWithGoogle() {
         }
       }
     } catch (error) {
-      console.error("Unexpected error during sign in:", error);
-      toast.error("An error occurred while trying to sign in with Google.");
+      toast.error(`${error}`);
     } finally {
     }
   };
-
   return { handleClick };
 }

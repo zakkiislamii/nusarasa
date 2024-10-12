@@ -58,7 +58,7 @@ export const useLogin = () => {
       if (axios.isAxiosError(error)) {
         toast.error(`${error.response?.data?.message}`);
       } else {
-        toast.error("An unexpected error occurred. Please try again.");
+        toast.error(`${error}`);
       }
     } finally {
       setLoading(false);
@@ -81,7 +81,7 @@ export const useIsLogin = () => {
       setIsLoggedIn(response.data.data.isLoggedIn);
     } catch (error) {
       setIsLoggedIn(false);
-      console.error("Error checking login status:", error);
+      toast.error(`${error}`);
     }
   }, []);
 
@@ -115,8 +115,7 @@ export const useLogout = () => {
       toast.success("Logged out successfully");
       router.push("/");
     } catch (error) {
-      toast.error("Failed to logout. Please try again.");
-      console.error("Logout error:", error);
+      toast.error(`${error}`);
     }
   }, [router, setIsLoggedIn]);
 

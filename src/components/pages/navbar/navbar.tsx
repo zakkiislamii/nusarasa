@@ -8,7 +8,7 @@ import {
   useIsLogin,
   useScrollHandler,
   useLogout,
-} from "@/app/(pages)/(auth)/(auth)/login/services";
+} from "@/app/(pages)/(auth)/login/services";
 
 const NavBar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -74,7 +74,7 @@ const NavBar = () => {
             menuOpen ? "block" : "hidden"
           } lg:block`}
         >
-          <ul className="flex text-base flex-col lg:flex-row items-center  lg:gap-[4vw] sm:gap-[5vw] gap-[6vw] text-white">
+          <ul className="flex text-base flex-col lg:flex-row items-center lg:gap-[4vw] sm:gap-[5vw] gap-[10vw] text-white">
             {NAV_LINKS.map(({ href, label }) => (
               <li key={href}>
                 <Link
@@ -87,57 +87,65 @@ const NavBar = () => {
                 </Link>
               </li>
             ))}
-
             {isLoggedIn ? (
-              <li className="relative">
-                <button
-                  className="flex gap-3 items-center rounded-2xl py-3 px-6"
-                  onClick={toggleDropdown}
-                  aria-expanded={dropdownOpen}
-                >
+              <ul className="flex flex-row items-center lg:gap-[2vw] sm:gap-[3vw] gap-[8vw] ">
+                <li>
                   <Image
-                    src={IMAGES.userIcon.src}
-                    alt={IMAGES.userIcon.alt}
-                    className={IMAGES.userIcon.className}
+                    src={IMAGES.cart.src}
+                    alt={IMAGES.cart.alt}
+                    className={IMAGES.cart.className}
                   />
+                </li>
+                <li>
                   <Image
-                    src={IMAGES.arrow.src}
-                    alt={IMAGES.arrow.alt}
-                    className={`${IMAGES.arrow.className} ${
-                      dropdownOpen ? "rotate-180" : ""
-                    }`}
+                    src={IMAGES.bell.src}
+                    alt={IMAGES.bell.alt}
+                    className={IMAGES.bell.className}
                   />
-                </button>
-                {dropdownOpen && (
-                  <div className="absolute text-white left-1/2 transform px-[2px] py-[2px] -translate-x-1/2 mt-2 w-48 rounded-xl z-50 bg-[#F4991A] ">
-                    <div className="text-white-Normal font-KronaOne rounded-xl bg-black">
-                      <ul className="p-2 text-center">
-                        <li>
-                          <Link
-                            href="/profile"
-                            className="block px-4 py-2 text-white hover:bg-gray-500 mb-2"
-                          >
-                            Profil
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            href="/dashboard"
-                            className="block px-4 py-2 text-white hover:bg-gray-500 mb-2"
-                          >
-                            Dashboard
-                          </Link>
-                        </li>
-                        <li className="cursor-pointer" onClick={handleLogout}>
-                          <button className="w-full px-4 py-2 max-w-full text-white hover:bg-gray-500">
-                            Logout
-                          </button>
-                        </li>
-                      </ul>
+                </li>
+
+                <li className="relative">
+                  <button
+                    className="flex gap-3 items-center rounded-2xl py-3 px-6"
+                    onClick={toggleDropdown}
+                    aria-expanded={dropdownOpen}
+                  >
+                    <Image
+                      src={IMAGES.userIcon.src}
+                      alt={IMAGES.userIcon.alt}
+                      className={IMAGES.userIcon.className}
+                    />
+                    <Image
+                      src={IMAGES.arrow.src}
+                      alt={IMAGES.arrow.alt}
+                      className={`${IMAGES.arrow.className} ${
+                        dropdownOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
+                  {dropdownOpen && (
+                    <div className="absolute text-white left-1/2 transform px-[2px] py-[2px] -translate-x-1/2 mt-2 w-48 rounded-xl z-50 bg-[#F4991A] ">
+                      <div className="text-white-Normal font-KronaOne rounded-xl bg-black">
+                        <ul className="p-2 text-center">
+                          <li>
+                            <Link
+                              href="/dashboard"
+                              className="block px-4 py-2 text-white hover:bg-gray-500 mb-2"
+                            >
+                              Dashboard
+                            </Link>
+                          </li>
+                          <li className="cursor-pointer" onClick={handleLogout}>
+                            <button className="w-full px-4 py-2 max-w-full text-white hover:bg-gray-500">
+                              Logout
+                            </button>
+                          </li>
+                        </ul>
+                      </div>
                     </div>
-                  </div>
-                )}
-              </li>
+                  )}
+                </li>
+              </ul>
             ) : (
               <li className="border border-white cursor-pointer hover:text-[#dbc7c7] lg:block text-white justify-end px-[2px] py-[2px] rounded-2xl bg-[#F4991A]">
                 <Link href="/login">
