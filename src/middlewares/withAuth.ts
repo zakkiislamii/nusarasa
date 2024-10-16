@@ -14,7 +14,6 @@ export default function withAuth(
   return async (req: NextRequest, next: NextFetchEvent) => {
     const token = await getSessionFromAPI(req);
     const pathName = req.nextUrl.pathname;
-    console.log(token);
     if (requireAuth.some((path) => pathName.startsWith(path))) {
       if (!token) {
         return NextResponse.redirect(new URL("/", req.url));

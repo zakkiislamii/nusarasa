@@ -4,25 +4,46 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url       = env("DATABASE_URL") 
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id_user      String   @id @default(cuid()) @map("id_user")
+  fullname     String?
+  password     String?
+  address      String?
+  number_phone String?
+  token        String?  @unique
+  email        String?  @unique
+  username     String?  @unique
+  role         Role     @default(member)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  stores       Stores[]
+}
+
+model Stores {
+  id_store   String     @id @default(cuid()) @map("id_store")
+  store_name String
+  id_user    String
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  products   Products[]
+  user       Users      @relation(fields: [id_user], references: [id_user], onDelete: Cascade)
+}
+
+model Products {
+  id_product   String   @id @default(cuid()) @map("id_product")
+  product_name String
+  price        Float
+  id_store     String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  store        Stores   @relation(fields: [id_store], references: [id_store], onDelete: Cascade)
 }
 
 enum Role {
   seller
   admin
   member
-}
-
-model Users {
-  id_user       String      @default(cuid()) @id @map(name: "id_user")
-  fullname      String?
-  password      String?
-  address       String?
-  number_phone  String?
-  token         String?     @unique
-  email         String?     @unique
-  username      String?     @unique
-  role          Role        @default(member) 
-  createdAt     DateTime    @default(now()) @map(name: "created_at")
-  updatedAt     DateTime    @updatedAt @map(name: "updated_at")
 }

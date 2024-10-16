@@ -13,7 +13,7 @@ import {
 } from "../queries/userQueries";
 import { NextResponse, NextRequest } from "next/server";
 import bcrypt from "bcrypt/";
-import { encrypt, getSessionForCheck } from "@/utils/token/token";
+import { encrypt, getSession, getSessionForCheck } from "@/utils/token/token";
 
 export const getAllUsers = async (req: NextRequest) => {
   const apiKey = req.headers.get("x-api-key");
@@ -166,7 +166,8 @@ export const register = async (req: NextRequest) => {
         status: 200,
       }
     );
-  } catch (error: unknown) {
+  } catch (error) {
+    console.log(error);
     const errorMessage =
       error instanceof Error ? error.message : "An unknown error occurred";
     return NextResponse.json(
@@ -349,6 +350,7 @@ export const login = async (req: NextRequest) => {
         id: user.id_user,
         username: user.username,
         email: user.email,
+        role: user.role,
       },
       expired,
     });
@@ -723,6 +725,7 @@ export const checkAuth = async (req: NextRequest) => {
   }
 
   const session = await getSessionForCheck();
+  const token = await getSession();
   if (!session) {
     return NextResponse.json(
       {
@@ -744,6 +747,7 @@ export const checkAuth = async (req: NextRequest) => {
         isLoggedIn: true,
         user: session,
         session,
+        token,
       },
     },
     { status: 200 }

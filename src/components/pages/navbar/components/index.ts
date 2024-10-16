@@ -9,9 +9,13 @@ import bell from "@/assets/icon/navbar/bell.png";
 
 export const NAV_LINKS = [
   { href: "/", label: "Home" },
-  { href: "/tentang-kami", label: "Foods" },
-  { href: "/produk", label: "Drinks" },
-  { href: "/artikel", label: "Stores" },
+  { href: "/tentang-kami", label: "Tentang Kami" },
+  { href: "/stores", label: "Stores" },
+];
+export const NAV_LINKS_PRODUCTS = [
+  { href: "/all-products", label: "All Products" },
+  { href: "/foods", label: "Foods" },
+  { href: "/drinks", label: "Drinks" },
 ];
 
 export const IMAGES = {

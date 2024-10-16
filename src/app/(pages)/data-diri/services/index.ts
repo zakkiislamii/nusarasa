@@ -41,7 +41,6 @@ export const onSubmit = async (
     if (axios.isAxiosError(error)) {
       toast.error(`${error.response?.data?.message}`);
     } else {
-      console.log(error);
       toast.error("An unexpected error occurred. Please try again.");
     }
   }

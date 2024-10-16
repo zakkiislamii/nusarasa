@@ -112,6 +112,16 @@ export const getProfileById = async ({ token }: { token: string }) => {
   return data;
 };
 
+export const userWithRole = async ({ email }: { email: string }) => {
+  const data = await prisma.users.findUnique({
+    where: { email: email },
+    select: {
+      role: true,
+    },
+  });
+  return data;
+};
+
 export const FindUserBasedOnTheToken = async ({
   token,
   email,
@@ -192,28 +202,24 @@ export async function saveDataFromGoogle({
   email,
   username,
   token,
-  id_user,
 }: {
   fullname?: string;
   username?: string;
   email?: string;
   token: string;
-  id_user: string;
 }) {
   if (!email) {
     throw new Error("Email is required to save user data.");
   }
-
-  try {
-    const upsertedUser = await prisma.users.upsert({
-      where: { email },
-      create: { fullname, email, username, token, id_user },
-      update: { fullname, username, token, id_user },
-    });
-
-    return upsertedUser;
-  } catch (error) {
-    console.error("Error saving user data:", error);
-    throw error;
-  }
+  const data = await prisma.users.upsert({
+    where: { email },
+    create: { fullname, email, username, token },
+    update: { fullname, username, token },
+  });
+  return data;
 }
+
+export const findUserByEmail = async ({ email }: { email: string }) => {
+  const data = await prisma.users.findUnique({ where: { email: email } });
+  return data;
+};

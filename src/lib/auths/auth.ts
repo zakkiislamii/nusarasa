@@ -1,7 +1,11 @@
 import { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { encrypt } from "@/utils/token/token";
-import { saveToken } from "@/app/api/users/services/queries/userQueries";
+import {
+  existingUser,
+  saveDataFromGoogle,
+  userWithRole,
+} from "@/app/api/users/services/queries/userQueries";
 import { cookies } from "next/headers";
 
 export const authConfig: NextAuthOptions = {
@@ -24,22 +28,47 @@ export const authConfig: NextAuthOptions = {
           profile.email?.split("@")[0] ||
           profile.name?.replace(/\s+/g, "").toLowerCase();
         token.fullname = profile.name;
-        token.email = profile.email;
-        token.username = username;
+        token.email = profile.email as string;
+        token.username = username as string;
+        // cek role
+        const roleUser = await userWithRole({ email: token.email });
+        if (!roleUser) {
+          token.role = "member";
+        } else {
+          token.role = roleUser.role;
+        }
 
+        // make a token
         const customToken = await encrypt({
           user: {
             id: profile.sub,
             username: username,
             email: profile.email,
+            role: roleUser,
           },
           expired: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
         });
         token.accessToken = customToken;
-        await saveToken({
-          token: customToken,
-          username: token.username as string,
+        const user = await existingUser({
+          email: token.email,
+          username: token.username,
         });
+        console.log("Extracted Username:", token.username);
+        if (user) {
+          await saveDataFromGoogle({
+            fullname: token.fullname,
+            username: token.username,
+            email: token.email,
+            token: customToken,
+          });
+        } else {
+          await saveDataFromGoogle({
+            fullname: token.fullname,
+            username: token.username,
+            email: token.email,
+            token: customToken,
+          });
+        }
         cookies().set({
           name: "session",
           value: customToken,
@@ -53,10 +82,13 @@ export const authConfig: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
-      session.user.username = token.username as string;
-      session.user.fullname = token.fullname as string;
-      session.user.email = token.email as string;
-      session.user.accessToken = token.accessToken as string;
+      if (token) {
+        session.user.username = token.username as string;
+        session.user.fullname = token.fullname as string;
+        session.user.email = token.email as string;
+        session.user.accessToken = token.accessToken as string;
+        session.user.role = token.role;
+      }
       return session;
     },
   },

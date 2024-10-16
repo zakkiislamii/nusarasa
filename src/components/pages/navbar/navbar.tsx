@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { NAV_LINKS, IMAGES } from "./components/index";
+import { NAV_LINKS, IMAGES, NAV_LINKS_PRODUCTS } from "./components/index";
 import {
   useIsLogin,
   useScrollHandler,
@@ -15,10 +15,13 @@ const NavBar = () => {
   const pathname = usePathname();
   const handleLogout = useLogout();
   const { isScrolling, isScrolled } = useScrollHandler();
-  const { isLoggedIn, checkLoginStatus } = useIsLogin();
+  const { isLoggedIn, checkLoginStatus, userRole } = useIsLogin();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [dropdownProductOpen, setDropdownProductOpen] = useState(false);
   const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
   const toggleMenu = () => setMenuOpen(!menuOpen);
+  const toggleProductDropdown = () =>
+    setDropdownProductOpen(!dropdownProductOpen);
 
   useEffect(() => {
     checkLoginStatus();
@@ -28,14 +31,14 @@ const NavBar = () => {
   const headerClassName = `
     z-50 w-full top-0 left-0 
     ${
-      isScrolled && isScrolling ? "bg-opacity-10 backdrop-blur" : "bg-[#000000]"
+      isScrolled && isScrolling ? "bg-opacity-10 backdrop-blur" : "bg-[#F9F5F0]"
     }
     transition-all duration-300 sticky
   `;
 
   return (
     <header className={headerClassName}>
-      <nav className="text-white font-bold flex flex-col lg:flex-row justify-between items-center mx-auto w-full p-6 sm:ps-10 sm:pe-10">
+      <nav className="font-bold flex flex-col lg:flex-row justify-between items-center mx-auto w-full p-6 sm:ps-10 sm:pe-10">
         <div className="flex flex-col lg:flex-row justify-between items-center w-full lg:w-auto">
           <div className="flex items-center justify-between w-full lg:w-auto">
             <Link href="/" className="flex sm:gap-3 gap-2 items-center">
@@ -70,11 +73,11 @@ const NavBar = () => {
         </div>
 
         <div
-          className={`pe-1 flex flex-col lg:pt-0 pt-10  lg:flex-row items-center gap-[3.5vw] text-white z-50 ${
+          className={`pe-1 flex flex-col lg:pt-0 pt-10  lg:flex-row items-center gap-[3.5vw]  z-50 ${
             menuOpen ? "block" : "hidden"
           } lg:block`}
         >
-          <ul className="flex text-base flex-col lg:flex-row items-center lg:gap-[4vw] sm:gap-[5vw] gap-[10vw] text-white">
+          <ul className="flex text-base  flex-col lg:flex-row  items-center lg:gap-[4vw] sm:gap-[5vw] gap-[10vw] text-[#554433]">
             {NAV_LINKS.map(({ href, label }) => (
               <li key={href}>
                 <Link
@@ -87,6 +90,44 @@ const NavBar = () => {
                 </Link>
               </li>
             ))}
+
+            {/* Dropdown for Products */}
+            <li className="relative ">
+              <button
+                className="flex gap-3 items-center rounded-2xl py-3 px-6"
+                onClick={toggleProductDropdown}
+                aria-expanded={dropdownProductOpen}
+              >
+                <p>Products</p>
+                <Image
+                  src={IMAGES.arrow.src}
+                  alt={IMAGES.arrow.alt}
+                  className={`${IMAGES.arrow.className} ${
+                    dropdownProductOpen ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
+
+              {dropdownProductOpen && (
+                <div className="absolute bg-[#F9F5F0] border-[#F4991A] border-[3px]  shadow-lg rounded-lg w-full max-w-full z-50 justify-center items-center flex-col text-center flex py-3 px-10">
+                  <ul className="flex flex-col gap-5 w-full max-w-full ">
+                    {NAV_LINKS_PRODUCTS.map(({ href, label }) => (
+                      <li key={href}>
+                        <Link
+                          href={href}
+                          className={`  hover:text-[#A4A4A4]   w-full  ${
+                            pathname === href ? "text-[#ee6418]" : ""
+                          }`}
+                        >
+                          {label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </li>
+
             {isLoggedIn ? (
               <ul className="flex flex-row items-center lg:gap-[2vw] sm:gap-[3vw] gap-[8vw] ">
                 <li>
@@ -103,6 +144,15 @@ const NavBar = () => {
                     className={IMAGES.bell.className}
                   />
                 </li>
+                {userRole === "admin" && (
+                  <p className="text-black z-50">ini admin</p>
+                )}
+                {userRole === "member" && (
+                  <p className="text-black z-50">ini member</p>
+                )}
+                {userRole === "seller" && (
+                  <p className="text-black z-50">ini seller</p>
+                )}
 
                 <li className="relative">
                   <button
@@ -124,24 +174,22 @@ const NavBar = () => {
                     />
                   </button>
                   {dropdownOpen && (
-                    <div className="absolute text-white left-1/2 transform px-[2px] py-[2px] -translate-x-1/2 mt-2 w-48 rounded-xl z-50 bg-[#F4991A] ">
-                      <div className="text-white-Normal font-KronaOne rounded-xl bg-black">
-                        <ul className="p-2 text-center">
-                          <li>
-                            <Link
-                              href="/dashboard"
-                              className="block px-4 py-2 text-white hover:bg-gray-500 mb-2"
-                            >
-                              Dashboard
-                            </Link>
-                          </li>
-                          <li className="cursor-pointer" onClick={handleLogout}>
-                            <button className="w-full px-4 py-2 max-w-full text-white hover:bg-gray-500">
-                              Logout
-                            </button>
-                          </li>
-                        </ul>
-                      </div>
+                    <div className=" text-[#554433] border-[#F4991A] border-[3px] right-7 shadow-lg py-3 px-20  absolute w-full max-w-full z-50 justify-center items-center flex-col text-center flex rounded-xl  bg-[#F9F5F0]">
+                      <ul className="text-center  gap-5 w-full items-center  justify-center  flex flex-col">
+                        <li>
+                          <Link
+                            href="/dashboard"
+                            className="block px-4 py-2 rounded-lg   hover:bg-[#d4b61e]"
+                          >
+                            Dashboard
+                          </Link>
+                        </li>
+                        <li className="cursor-pointer" onClick={handleLogout}>
+                          <button className="text-center px-4 py-2 rounded-lg w-full hover:bg-[#d4b61e]">
+                            Logout
+                          </button>
+                        </li>
+                      </ul>
                     </div>
                   )}
                 </li>

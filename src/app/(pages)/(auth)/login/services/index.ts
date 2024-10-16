@@ -70,6 +70,7 @@ export const useLogin = () => {
 
 export const useIsLogin = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userRole, setUserRole] = useState<string | null>(null);
 
   const checkLoginStatus = useCallback(async () => {
     try {
@@ -79,17 +80,18 @@ export const useIsLogin = () => {
         },
       });
       setIsLoggedIn(response.data.data.isLoggedIn);
+      setUserRole(response.data.data.user.user.role);
     } catch (error) {
-      setIsLoggedIn(false);
       toast.error(`${error}`);
+      setIsLoggedIn(false);
+      setUserRole(null);
     }
   }, []);
 
   useEffect(() => {
     checkLoginStatus();
   }, [checkLoginStatus]);
-
-  return { isLoggedIn, setIsLoggedIn, checkLoginStatus };
+  return { isLoggedIn, setIsLoggedIn, checkLoginStatus, userRole };
 };
 
 export const useLogout = () => {
@@ -113,6 +115,7 @@ export const useLogout = () => {
       );
       setIsLoggedIn(false);
       toast.success("Logged out successfully");
+      window.location.reload();
       router.push("/");
     } catch (error) {
       toast.error(`${error}`);
