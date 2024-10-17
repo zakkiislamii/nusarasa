@@ -1,9 +1,9 @@
 "use client";
 import Button from "@/components/buttoms/buttom submit";
 import Image from "next/image";
-import { IMAGES } from "../../../../components/pages/profile";
+import { IMAGES } from "@/components/pages/profile";
 import ButtonBack from "@/components/buttoms/buttom back";
-import { useProfileData } from "../../../../services/profile";
+import { useProfileData } from "@/services/profile";
 import { useRouter } from "next/navigation";
 import LoadingState from "@/components/loading";
 

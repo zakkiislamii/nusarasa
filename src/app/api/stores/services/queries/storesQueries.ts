@@ -14,7 +14,15 @@ if (process.env.NODE_ENV === "production") {
 // getAll
 export const findManyStores = async () => {
   return await prisma.stores.findMany({
-    include: {
+    select: {
+      id_store: true,
+      id_user: true,
+      user: {
+        select: {
+          fullname: true,
+        },
+      },
+      store_name: true,
       products: {
         select: {
           id_product: true,

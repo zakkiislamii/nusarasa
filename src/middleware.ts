@@ -1,7 +1,7 @@
 import withAuth from "./middlewares/withAuth";
 import { NextResponse } from "next/server";
 
-const authRequiredPages = ["/profile", "/edit-profile", "/data-diri"];
+const authRequiredPages = ["/dashboard"];
 const noAuthPages = ["/register", "/login"];
 
 export function mainMiddleware() {
