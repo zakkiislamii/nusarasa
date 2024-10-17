@@ -723,6 +723,18 @@ export const checkAuth = async (req: NextRequest) => {
       { status: 405 }
     );
   }
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return NextResponse.json(
+      {
+        code: 401,
+        status: "Failed",
+        error: "Unauthorized",
+        message: "Missing or invalid Bearer token",
+      },
+      { status: 401 }
+    );
+  }
 
   const session = await getSessionForCheck();
   const token = await getSession();
@@ -745,7 +757,6 @@ export const checkAuth = async (req: NextRequest) => {
       message: "Authenticated",
       data: {
         isLoggedIn: true,
-        user: session,
         session,
         token,
       },

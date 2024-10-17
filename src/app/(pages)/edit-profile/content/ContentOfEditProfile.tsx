@@ -1,11 +1,11 @@
 "use client";
 import Image from "next/image";
 import Button from "@/components/buttoms/buttom submit";
-import { IMAGES } from "../components";
+import { IMAGES } from "@/components/pages/edit-profile";
 import ButtonBack from "@/components/buttoms/buttom back";
-import { useProfileForm, onSubmit } from "../services";
+import { useProfileForm, onSubmit } from "@/services/edit-profile";
 import { useRouter } from "next/navigation";
-import { useProfileData } from "../../profile/services";
+import { useProfileData } from "@/services/profile";
 
 export default function ContentEditProfile() {
   const { profileData } = useProfileData();

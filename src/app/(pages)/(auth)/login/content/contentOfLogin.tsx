@@ -1,9 +1,9 @@
 "use client";
 import Image from "next/image";
-import { useLoginForm, useLogin } from "../services";
+import { useLoginForm, useLogin } from "../../../../../services/login";
 import Link from "next/link";
-import { useTogglePassword } from "../components";
-import { icons } from "../components";
+import { useTogglePassword } from "../../../../../components/pages/login";
+import { icons } from "../../../../../components/pages/login";
 import ButtonGoogle from "@/components/buttoms/buttom submit google";
 import Button from "@/components/buttoms/buttom submit";
 import LoadingState from "@/components/loading";

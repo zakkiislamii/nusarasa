@@ -1,6 +1,6 @@
 import { toast } from "sonner";
 import axios from "axios";
-import { dataDiriFormData } from "../components";
+import { dataDiriFormData } from "@/components/pages/data-diri";
 import { getSession } from "@/utils/token/token";
 
 export const handleChange = (

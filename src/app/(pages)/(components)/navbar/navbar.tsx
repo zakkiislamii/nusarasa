@@ -3,19 +3,23 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { NAV_LINKS, IMAGES, NAV_LINKS_PRODUCTS } from "./components/index";
 import {
-  useIsLogin,
-  useScrollHandler,
-  useLogout,
-} from "@/app/(pages)/(auth)/login/services";
+  NAV_LINKS,
+  IMAGES,
+  NAV_LINKS_PRODUCTS,
+} from "../../../../components/navbar/components/index";
+import { useScrollHandler, useLogout } from "@/services/login";
+import { useCheckLoginUser } from "@/services/checkLogin";
+import Member from "@/components/navbar/member/page";
+import Admin from "@/components/navbar/admin/page";
+import Seller from "@/components/navbar/seller/page";
 
 const NavBar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
   const handleLogout = useLogout();
   const { isScrolling, isScrolled } = useScrollHandler();
-  const { isLoggedIn, checkLoginStatus, userRole } = useIsLogin();
+  const { isLoggedIn, userRole } = useCheckLoginUser();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [dropdownProductOpen, setDropdownProductOpen] = useState(false);
   const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
@@ -24,9 +28,8 @@ const NavBar = () => {
     setDropdownProductOpen(!dropdownProductOpen);
 
   useEffect(() => {
-    checkLoginStatus();
     setMenuOpen(false);
-  }, [pathname, checkLoginStatus]);
+  }, [pathname]);
 
   const headerClassName = `
     z-50 w-full top-0 left-0 
@@ -130,29 +133,9 @@ const NavBar = () => {
 
             {isLoggedIn ? (
               <ul className="flex flex-row items-center lg:gap-[2vw] sm:gap-[3vw] gap-[8vw] ">
-                <li>
-                  <Image
-                    src={IMAGES.cart.src}
-                    alt={IMAGES.cart.alt}
-                    className={IMAGES.cart.className}
-                  />
-                </li>
-                <li>
-                  <Image
-                    src={IMAGES.bell.src}
-                    alt={IMAGES.bell.alt}
-                    className={IMAGES.bell.className}
-                  />
-                </li>
-                {userRole === "admin" && (
-                  <p className="text-black z-50">ini admin</p>
-                )}
-                {userRole === "member" && (
-                  <p className="text-black z-50">ini member</p>
-                )}
-                {userRole === "seller" && (
-                  <p className="text-black z-50">ini seller</p>
-                )}
+                {userRole === "admin" && <Admin />}
+                {userRole === "member" && <Member />}
+                {userRole === "seller" && <Seller />}
 
                 <li className="relative">
                   <button

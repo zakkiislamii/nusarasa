@@ -1,6 +1,6 @@
 import { toast } from "sonner";
 import axios from "axios";
-import { editProfileData } from "../components";
+import { editProfileData } from "@/components/pages/edit-profile";
 import { useState, useEffect } from "react";
 import { getSession } from "@/utils/token/token";
 

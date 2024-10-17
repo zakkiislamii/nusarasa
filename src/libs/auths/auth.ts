@@ -2,11 +2,11 @@ import { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { encrypt } from "@/utils/token/token";
 import {
-  existingUser,
   saveDataFromGoogle,
   userWithRole,
 } from "@/app/api/users/services/queries/userQueries";
 import { cookies } from "next/headers";
+import { Role } from "@prisma/client";
 
 export const authConfig: NextAuthOptions = {
   providers: [
@@ -17,58 +17,49 @@ export const authConfig: NextAuthOptions = {
   ],
   callbacks: {
     async signIn({ account, profile }) {
-      if (account && profile) {
-        return true;
-      }
-      return false;
+      return !!(account && profile);
     },
     async jwt({ token, account, profile }) {
       if (account && profile) {
         const username =
           profile.email?.split("@")[0] ||
-          profile.name?.replace(/\s+/g, "").toLowerCase();
-        token.fullname = profile.name;
+          profile.name?.replace(/\s+/g, "").toLowerCase() ||
+          "";
+        token.fullname = profile.name || "";
         token.email = profile.email as string;
-        token.username = username as string;
-        // cek role
-        const roleUser = await userWithRole({ email: token.email });
-        if (!roleUser) {
-          token.role = "member";
-        } else {
-          token.role = roleUser.role;
-        }
+        token.username = username;
 
-        // make a token
+        // Check role
+        const roleUser = await userWithRole({ email: token.email });
+        token.role = (
+          roleUser
+            ? typeof roleUser === "string"
+              ? roleUser
+              : roleUser.role
+            : "member"
+        ) as Role;
+
+        // Create a token
         const customToken = await encrypt({
           user: {
-            id: profile.sub,
-            username: username,
-            email: profile.email,
-            role: roleUser,
+            id: profile.sub || "",
+            username,
+            email: profile.email || "",
+            role: token.role,
           },
           expired: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
         });
         token.accessToken = customToken;
-        const user = await existingUser({
+
+        console.log("Extracted Username:", username);
+
+        await saveDataFromGoogle({
+          fullname: token.fullname,
+          username,
           email: token.email,
-          username: token.username,
+          token: customToken,
         });
-        console.log("Extracted Username:", token.username);
-        if (user) {
-          await saveDataFromGoogle({
-            fullname: token.fullname,
-            username: token.username,
-            email: token.email,
-            token: customToken,
-          });
-        } else {
-          await saveDataFromGoogle({
-            fullname: token.fullname,
-            username: token.username,
-            email: token.email,
-            token: customToken,
-          });
-        }
+
         cookies().set({
           name: "session",
           value: customToken,
@@ -87,7 +78,7 @@ export const authConfig: NextAuthOptions = {
         session.user.fullname = token.fullname as string;
         session.user.email = token.email as string;
         session.user.accessToken = token.accessToken as string;
-        session.user.role = token.role;
+        session.user.role = token.role as Role;
       }
       return session;
     },

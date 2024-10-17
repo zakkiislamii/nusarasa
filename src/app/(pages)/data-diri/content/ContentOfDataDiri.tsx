@@ -1,9 +1,9 @@
 "use client";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { icons } from "../components";
-import { onSubmit, handleChange } from "../services";
-import { dataDiriFormData } from "../components";
+import { icons } from "../../../../components/pages/data-diri";
+import { onSubmit, handleChange } from "@/services/data-diri";
+import { dataDiriFormData } from "../../../../components/pages/data-diri";
 import { useState } from "react";
 import Button from "@/components/buttoms/buttom submit";
 

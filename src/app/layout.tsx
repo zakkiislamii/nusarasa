@@ -4,9 +4,9 @@ import { Toaster } from "sonner";
 import { Rubik } from "next/font/google";
 import dynamic from "next/dynamic";
 import logo from "@/assets/icon/navbar/logo.png";
-import NavBar from "@/components/pages/navbar/navbar";
+import NavBar from "@/app/(pages)/(components)/navbar/navbar";
 import NextAuthProvider from "@/components/provider/nextauth";
-import Footer from "@/components/pages/footer/footer";
+import Footer from "@/app/(pages)/(components)/footer/footer";
 
 const ProgressBar = dynamic(() => import("@/components/progress-bar/index"), {
   ssr: false,

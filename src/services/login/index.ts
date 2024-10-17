@@ -29,8 +29,6 @@ export const useLoginForm = (
 };
 
 export const useLogin = () => {
-  const router = useRouter();
-  const { setIsLoggedIn } = useIsLogin();
   const [loading, setLoading] = useState(false);
 
   const onSubmit = async (
@@ -50,9 +48,8 @@ export const useLogin = () => {
       if (response.data?.error) {
         toast.error(`${response?.data?.message}`);
       } else {
-        setIsLoggedIn(true);
         toast.success("Login Successful");
-        router.push("/data-diri");
+        window.location.reload();
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -68,35 +65,8 @@ export const useLogin = () => {
   return { onSubmit, loading };
 };
 
-export const useIsLogin = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userRole, setUserRole] = useState<string | null>(null);
-
-  const checkLoginStatus = useCallback(async () => {
-    try {
-      const response = await axios.get("/api/users/checkAuth", {
-        headers: {
-          "x-api-key": process.env.NEXT_PUBLIC_API_KEY,
-        },
-      });
-      setIsLoggedIn(response.data.data.isLoggedIn);
-      setUserRole(response.data.data.user.user.role);
-    } catch (error) {
-      toast.error(`${error}`);
-      setIsLoggedIn(false);
-      setUserRole(null);
-    }
-  }, []);
-
-  useEffect(() => {
-    checkLoginStatus();
-  }, [checkLoginStatus]);
-  return { isLoggedIn, setIsLoggedIn, checkLoginStatus, userRole };
-};
-
 export const useLogout = () => {
   const router = useRouter();
-  const { setIsLoggedIn } = useIsLogin();
 
   const logout = useCallback(async () => {
     try {
@@ -113,14 +83,14 @@ export const useLogout = () => {
           },
         }
       );
-      setIsLoggedIn(false);
+
       toast.success("Logged out successfully");
       window.location.reload();
       router.push("/");
     } catch (error) {
       toast.error(`${error}`);
     }
-  }, [router, setIsLoggedIn]);
+  }, [router]);
 
   return logout;
 };

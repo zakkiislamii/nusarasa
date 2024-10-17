@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { IMAGES, NAV_LINKS } from "./components/index";
+import { IMAGES, NAV_LINKS } from "@/components/footer/components/index";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 

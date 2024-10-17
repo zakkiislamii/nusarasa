@@ -1,6 +1,6 @@
 import { toast } from "sonner";
 import axios from "axios";
-import { registerFormData } from "../components";
+import { registerFormData } from "@/components/pages/register";
 import { useState } from "react";
 
 export const useRegisterForm = (
