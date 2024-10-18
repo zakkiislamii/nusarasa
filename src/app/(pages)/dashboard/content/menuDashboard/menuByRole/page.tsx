@@ -1,13 +1,14 @@
 "use client";
 
 import { useCheckLoginUser } from "@/services/(auth)/checkLogin";
-import { validateRole } from "@/services/dashboard/menuDashboard";
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   NAV_LINKS_DASHBOARD_ADMIN,
   NAV_LINKS_DASHBOARD_SELLER,
   NAV_LINKS_DASHBOARD_MEMBER,
+  validateRole,
 } from "@/components/pages/dashboard";
 import { Role } from "@prisma/client";
 
