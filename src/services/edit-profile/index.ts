@@ -64,7 +64,7 @@ export const onSubmit = async (
       toast.error(`${response?.data?.message}`);
     } else {
       toast.success("Personal data entry successful");
-      push("/profile");
+      push("/dashboard/profile");
     }
   } catch (error) {
     if (axios.isAxiosError(error)) {
