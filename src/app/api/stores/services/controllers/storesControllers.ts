@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { findManyStores } from "../queries/storesQueries";
-import { decrypt } from "@/utils/token/token";
 
 export const getAllStores = async (req: NextRequest) => {
   const apiKey = req.headers.get("x-api-key");
@@ -28,33 +27,8 @@ export const getAllStores = async (req: NextRequest) => {
       { status: 405 }
     );
   }
-  const authHeader = req.headers.get("Authorization");
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return NextResponse.json(
-      {
-        code: 401,
-        status: "Failed",
-        error: "Unauthorized",
-        message: "Missing or invalid Bearer token",
-      },
-      { status: 401 }
-    );
-  }
-  try {
-    const token = authHeader.split(" ")[1];
-    const decodedToken = await decrypt(token);
-    if (!decodedToken || decodedToken.user.role !== "seller") {
-      return NextResponse.json(
-        {
-          code: 403,
-          status: "Failed",
-          error: "Forbidden",
-          message: "Access denied. Only sellers can access this resource.",
-        },
-        { status: 403 }
-      );
-    }
 
+  try {
     const data = await findManyStores();
     if (data) {
       return NextResponse.json(

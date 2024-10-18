@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { useLoginForm, useLogin } from "../../../../../services/login";
+import { useLoginForm, useLogin } from "../../../../../services/(auth)/login";
 import Link from "next/link";
 import { useTogglePassword } from "../../../../../components/pages/login";
 import { icons } from "../../../../../components/pages/login";
