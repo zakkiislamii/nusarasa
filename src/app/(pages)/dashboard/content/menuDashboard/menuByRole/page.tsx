@@ -8,8 +8,8 @@ import {
   NAV_LINKS_DASHBOARD_ADMIN,
   NAV_LINKS_DASHBOARD_SELLER,
   NAV_LINKS_DASHBOARD_MEMBER,
-  Role,
 } from "@/components/pages/dashboard";
+import { Role } from "@prisma/client";
 
 export default function MenuDashboardClient() {
   const { userRole } = useCheckLoginUser();

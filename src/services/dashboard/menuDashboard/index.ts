@@ -1,4 +1,4 @@
-import { Role } from "@/components/pages/dashboard";
+import { Role } from "@prisma/client";
 
 export function validateRole(userRole: string): Role {
   switch (userRole) {

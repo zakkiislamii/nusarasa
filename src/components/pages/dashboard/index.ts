@@ -16,5 +16,3 @@ export const NAV_LINKS_DASHBOARD_ADMIN = [
   { href: "/dashboard/all-member", label: "All Member" },
   { href: "/dashboard/all-seller", label: "All Seller" },
 ];
-
-export type Role = "admin" | "seller" | "member";
