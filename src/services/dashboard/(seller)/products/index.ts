@@ -17,7 +17,7 @@ export const useGetAllProducts = () => {
       setError(null);
       try {
         const token = await getSession();
-        const response = await axios.get("/api/products", {
+        const response = await axios.get("/api/sellers/products", {
           headers: {
             "Content-Type": "application/json",
             "x-api-key": process.env.NEXT_PUBLIC_API_KEY,

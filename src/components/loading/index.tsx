@@ -12,7 +12,7 @@ export default function LoadingState() {
   }, []);
   return (
     <PacmanLoader
-      color="#F9F5F0"
+      color="#000000"
       cssOverride={{}}
       loading={loading}
       size={100}
