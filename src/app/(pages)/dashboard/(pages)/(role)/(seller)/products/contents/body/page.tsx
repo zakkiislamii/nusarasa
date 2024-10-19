@@ -1,6 +1,6 @@
 "use client";
 import LoadingState from "@/components/loading";
-import { useGetAllProducts } from "@/services/dashboard/(seller)/products";
+import { useGetAllProducts } from "@/services/dashboard/role/seller/products";
 
 export default function Body() {
   const { products, stores, selectedStore, setSelectedStore, loading, error } =

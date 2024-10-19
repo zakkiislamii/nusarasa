@@ -3,7 +3,7 @@ import LoadingState from "@/components/loading";
 import {
   useFilteredAndSortedMembers,
   SortKey,
-} from "@/services/dashboard/(admin)/all-member";
+} from "@/services/dashboard/role/admin/all-member";
 
 export default function Body() {
   const {

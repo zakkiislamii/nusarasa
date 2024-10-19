@@ -10,9 +10,9 @@ import {
 } from "../../../../components/navbar/components/index";
 import { useScrollHandler, useLogout } from "@/services/auth/login";
 import { useCheckLoginUser } from "@/services/auth/checkLogin";
-import Member from "@/components/navbar/member/page";
-import Admin from "@/components/navbar/admin/page";
-import Seller from "@/components/navbar/seller/page";
+import Member from "@/components/navbar/role/member/page";
+import Admin from "@/components/navbar/role/admin/page";
+import Seller from "@/components/navbar/role/seller/page";
 
 const NavBar = () => {
   const [menuOpen, setMenuOpen] = useState(false);

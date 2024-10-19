@@ -17,7 +17,7 @@ export default function LoadingState() {
       <ScaleLoader
         color="#000000"
         loading={loading}
-        radius={4}
+        radius={2}
         width={10}
         height={100}
         speedMultiplier={0.5}
