@@ -1,11 +1,17 @@
 "use client";
+import LoadingState from "@/components/loading";
 import { useGetAllProducts } from "@/services/dashboard/(seller)/products";
 
 export default function Body() {
   const { products, stores, selectedStore, setSelectedStore, loading, error } =
     useGetAllProducts();
 
-  if (loading) return <div>Loading...</div>;
+  if (loading)
+    return (
+      <>
+        <LoadingState />
+      </>
+    );
   if (error) return <div>Error: {error}</div>;
 
   return (

@@ -1,4 +1,5 @@
 "use client";
+import LoadingState from "@/components/loading";
 import {
   useFilteredAndSortedMembers,
   SortKey,
@@ -11,8 +12,16 @@ export default function Body() {
     setSearchTerm,
     sortBy,
     setSortBy,
+    loading,
   } = useFilteredAndSortedMembers();
 
+  if (loading) {
+    return (
+      <>
+        <LoadingState />
+      </>
+    );
+  }
   return (
     <div className="p-6 max-w-7xl mx-auto">
       <h1 className="text-3xl font-bold mb-6">Member List</h1>

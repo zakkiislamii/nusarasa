@@ -6,12 +6,19 @@ import ButtonBack from "@/components/buttoms/buttom back";
 import { useProfileForm, onSubmit } from "@/services/dashboard/edit-profile";
 import { useRouter } from "next/navigation";
 import { useProfileData } from "@/services/dashboard/profile";
+import LoadingState from "@/components/loading";
 
 export default function ContentEditProfile() {
-  const { profileData } = useProfileData();
+  const { profileData, loading } = useProfileData();
   const router = useRouter();
   const { formData, handleChange } = useProfileForm(profileData);
-
+  if (loading) {
+    return (
+      <>
+        <LoadingState />
+      </>
+    );
+  }
   return (
     <div className="relative flex-1 p-6 flex justify-center items-center">
       <div className="w-full max-w-[35rem] p-1 text-[#554433] flex flex-col border border-black gap-[15px] relative text-center items-center justify-center z-10 rounded-xl bg-[#F9F5F0]">

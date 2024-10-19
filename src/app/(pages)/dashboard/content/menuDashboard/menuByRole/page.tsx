@@ -1,6 +1,6 @@
 "use client";
 
-import { useCheckLoginUser } from "@/services/(auth)/checkLogin";
+import { useCheckLoginUser } from "@/services/auth/checkLogin";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";

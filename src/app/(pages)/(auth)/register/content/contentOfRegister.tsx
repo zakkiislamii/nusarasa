@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { onSubmit, useRegisterForm } from "@/services/(auth)/register";
+import { onSubmit, useRegisterForm } from "@/services/auth/register";
 import { useRouter } from "next/navigation";
 import { useTogglePassword } from "../../../../../components/pages/register";
 import { icons } from "../../../../../components/pages/register";

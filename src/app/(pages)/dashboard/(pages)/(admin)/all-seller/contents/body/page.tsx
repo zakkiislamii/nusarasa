@@ -1,4 +1,5 @@
 "use client";
+import LoadingState from "@/components/loading";
 import { Product, Seller, Store } from "@/interfaces/dashboard/admin";
 import { useGetAllSeller } from "@/services/dashboard/(admin)/all-seller";
 
@@ -7,7 +8,9 @@ export default function Body() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-full">Loading...</div>
+      <>
+        <LoadingState />
+      </>
     );
   }
 

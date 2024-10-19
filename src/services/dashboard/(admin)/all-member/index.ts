@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Member } from "@/interfaces/dashboard/admin";
 import { getSession } from "@/utils/token/token";
 import axios from "axios";
@@ -8,10 +9,12 @@ export type SortKey = keyof Member;
 
 export const useGetAllMember = () => {
   const [members, setMembers] = useState<Member[]>([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchAllMember = async () => {
       try {
+        setLoading(true);
         const token = await getSession();
         const response = await axios.get("/api/admins/member", {
           headers: {
@@ -26,34 +29,36 @@ export const useGetAllMember = () => {
         }
       } catch (err) {
         toast.error(`${err}`);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchAllMember();
   }, []);
 
-  return members;
+  return { members, loading };
 };
 
 export const useFilteredAndSortedMembers = (
   initialSortBy: SortKey = "fullname"
 ) => {
-  const members = useGetAllMember();
+  const { members, loading } = useGetAllMember();
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState<SortKey>(initialSortBy);
 
   const filteredAndSortedMembers = useMemo(() => {
     return members
       .filter(
-        (member) =>
+        (member: Member) =>
           member.fullname?.toLowerCase().includes(searchTerm.toLowerCase()) ||
           member.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
           member.email.toLowerCase().includes(searchTerm.toLowerCase())
       )
-      .sort((a, b) => {
+      .sort((a: Member, b: Member) => {
         const aValue = a[sortBy] || "";
         const bValue = b[sortBy] || "";
-        return aValue.localeCompare(bValue);
+        return aValue.toString().localeCompare(bValue.toString());
       });
   }, [members, searchTerm, sortBy]);
 
@@ -63,5 +68,6 @@ export const useFilteredAndSortedMembers = (
     setSearchTerm,
     sortBy,
     setSortBy,
+    loading,
   };
 };
