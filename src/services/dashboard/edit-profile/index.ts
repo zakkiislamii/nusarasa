@@ -1,8 +1,9 @@
 import { toast } from "sonner";
 import axios from "axios";
-import { editProfileData } from "@/components/pages/edit-profile";
+
 import { useState, useEffect } from "react";
 import { getSession } from "@/utils/token/token";
+import { editProfileData } from "@/interfaces/edit-profile";
 
 export const useProfileForm = (initialProfileData: editProfileData) => {
   const [formData, setFormData] = useState<editProfileData>({

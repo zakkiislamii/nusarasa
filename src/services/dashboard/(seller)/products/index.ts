@@ -1,16 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { Product } from "@/interfaces/dashboard/seller";
 import { getSession } from "@/utils/token/token";
 import axios from "axios";
 import { useEffect, useState, useMemo } from "react";
 import { toast } from "sonner";
-
-interface Product {
-  id_store: string;
-  store_name: string;
-  id_product: string;
-  product_name: string;
-  price: number;
-}
 
 export const useGetAllProducts = () => {
   const [products, setProducts] = useState<Product[]>([]);

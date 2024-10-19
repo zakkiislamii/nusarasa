@@ -1,10 +1,6 @@
 "use client";
-import {
-  useGetAllSeller,
-  Seller,
-  Store,
-  Product,
-} from "@/services/dashboard/(admin)/all-seller";
+import { Product, Seller, Store } from "@/interfaces/dashboard/admin";
+import { useGetAllSeller } from "@/services/dashboard/(admin)/all-seller";
 
 export default function Body() {
   const { sellers, loading } = useGetAllSeller();

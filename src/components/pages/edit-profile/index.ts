@@ -11,11 +11,3 @@ export const IMAGES = {
   nameEmail: { src: email, alt: "icon name", className: "w-5 h-5" },
   nameUsername: { src: username, alt: "icon name", className: "w-5 h-5" },
 };
-
-export interface editProfileData {
-  fullname: string;
-  address: string;
-  number_phone: string;
-  email: string;
-  username: string;
-}

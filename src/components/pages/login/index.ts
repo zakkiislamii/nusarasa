@@ -4,10 +4,7 @@ import show from "@/assets/icon/show.png";
 import hide from "@/assets/icon/hide.png";
 import { useState } from "react";
 
-export interface LoginFormData {
-  username: string;
-  password: string;
-}
+
 export const icons = () => {
   return {
     iconUsername: username,

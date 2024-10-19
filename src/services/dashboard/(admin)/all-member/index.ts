@@ -1,14 +1,8 @@
+import { Member } from "@/interfaces/dashboard/admin";
 import { getSession } from "@/utils/token/token";
 import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-
-export interface Member {
-  id_user: string;
-  fullname: string | null;
-  email: string;
-  username: string;
-}
 
 export type SortKey = keyof Member;
 
