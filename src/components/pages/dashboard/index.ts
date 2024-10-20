@@ -2,6 +2,7 @@ import { Role } from "@prisma/client";
 
 export const NAV_LINKS_DASHBOARD_MEMBER = [
   { href: "/dashboard", label: "Dashboard" },
+  { href: "/dashboard/top-up", label: "Top Up+" },
   { href: "/dashboard/profile", label: "Profile" },
   { href: "/dashboard/history", label: "History" },
   { href: "/dashboard/message", label: "Message" },

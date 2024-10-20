@@ -43,7 +43,7 @@ export default function ContentOfProfile() {
                   className={IMAGES.nameEmail.className}
                 />
               </div>
-              <div className="w-full h-auto sm:h-[40px] py-2 placeholder-custom-gray pl-12 pr-5 border border-black text-[#1E1E1E] rounded-md text-left">
+              <div className="w-full h-auto py-2 placeholder-custom-gray pl-12 pr-5 border border-black text-[#1E1E1E] rounded-md text-left">
                 {profileData.email}
               </div>
             </div>
@@ -61,7 +61,7 @@ export default function ContentOfProfile() {
                   className={IMAGES.nameUsername.className}
                 />
               </div>
-              <div className="w-full h-auto sm:h-[40px] py-2 placeholder-custom-gray pl-12 pr-5 border border-black text-[#1E1E1E] rounded-md text-left">
+              <div className="w-full h-auto py-2 placeholder-custom-gray pl-12 pr-5 border border-black text-[#1E1E1E] rounded-md text-left">
                 {profileData.username}
               </div>
             </div>
@@ -79,7 +79,7 @@ export default function ContentOfProfile() {
                   className={IMAGES.nameIcon.className}
                 />
               </div>
-              <div className="w-full h-auto sm:h-[40px] py-2 placeholder-custom-gray pl-12 pr-5 border border-black text-[#1E1E1E] rounded-md text-left">
+              <div className="w-full h-auto  py-2 placeholder-custom-gray pl-12 pr-5 border border-black text-[#1E1E1E] rounded-md text-left">
                 {profileData.fullname}
               </div>
             </div>
@@ -119,7 +119,7 @@ export default function ContentOfProfile() {
                   className={IMAGES.nameNumber.className}
                 />
               </div>
-              <div className="w-full h-auto sm:h-[40px] py-2 placeholder-custom-gray pl-12 pr-5 border border-black text-[#1E1E1E] rounded-md text-left">
+              <div className="w-full h-auto py-2 placeholder-custom-gray pl-12 pr-5 border border-black text-[#1E1E1E] rounded-md text-left">
                 {profileData.number_phone}
               </div>
             </div>

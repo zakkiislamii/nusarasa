@@ -107,6 +107,7 @@ export const getProfileById = async ({ token }: { token: string }) => {
       address: true,
       number_phone: true,
       email: true,
+      balance: true,
     },
   });
   return data;

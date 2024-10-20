@@ -1,7 +1,7 @@
 "use client";
 
 import { useCheckLoginUser } from "@/services/auth/checkLogin";
-
+import { useProfileData } from "@/services/dashboard/profile";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -16,6 +16,7 @@ export default function MenuDashboardClient() {
   const { userRole } = useCheckLoginUser();
   const validatedRole = validateRole(userRole ?? "member");
   const pathname = usePathname();
+  const { profileData } = useProfileData();
 
   const getNavLinks = (role: Role) => {
     switch (role) {
@@ -32,6 +33,9 @@ export default function MenuDashboardClient() {
 
   return (
     <ul className="gap-10 flex flex-col font-bold">
+      {userRole === "member" && (
+        <span>Balance: Rp{profileData.balance.toLocaleString()}</span>
+      )}
       {navLinks.map(({ href, label }) => (
         <li key={href}>
           <Link

@@ -8,38 +8,107 @@ datasource db {
 }
 
 model Users {
-  id_user      String   @id @default(cuid()) @map("id_user")
-  fullname     String?
-  password     String?
-  address      String?
-  number_phone String?
-  token        String?  @unique
-  email        String?  @unique
-  username     String?  @unique
-  role         Role     @default(member)
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
-  stores       Stores[]
+  id_user           String            @id @default(cuid()) @map("id_user")
+  fullname          String?
+  password          String?
+  address           String?
+  number_phone      String?
+  token             String? @unique
+  email             String? @unique
+  username          String? @unique
+  role              Role              @default(member)
+  balance           Float             @default(0)
+  createdAt         DateTime          @default(now()) @map("created_at")
+  updatedAt         DateTime          @updatedAt @map("updated_at")
+  stores            Stores[]
+  productRatings    ProductRating[]
+  storeRatings      StoreRating[]
+  productComments   ProductComment[]
+  storeComments     StoreComment[]
+  messages          Message[]
 }
 
 model Stores {
-  id_store   String     @id @default(cuid()) @map("id_store")
+  id_store   String         @id @default(cuid()) @map("id_store")
   store_name String
   id_user    String
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
   products   Products[]
-  user       Users      @relation(fields: [id_user], references: [id_user], onDelete: Cascade)
+  user       Users          @relation(fields: [id_user], references: [id_user], onDelete: Cascade)
+  ratings    StoreRating[]
+  comments   StoreComment[]
+  messages   Message[]
 }
 
 model Products {
   id_product   String   @id @default(cuid()) @map("id_product")
   product_name String
   price        Float
+  quantity     Int      @default(0)
   id_store     String
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   store        Stores   @relation(fields: [id_store], references: [id_store], onDelete: Cascade)
+  ratings      ProductRating[]
+  comments     ProductComment[]
+}
+
+model ProductRating {
+  id          String      @id @default(cuid())
+  rating      Int         @default(0)
+  id_user     String
+  id_product  String
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  user        Users       @relation(fields: [id_user], references: [id_user], onDelete: Cascade)
+  product     Products    @relation(fields: [id_product], references: [id_product], onDelete: Cascade)
+  @@unique([id_user, id_product])
+}
+
+model StoreRating {
+  id          String      @id @default(cuid())
+  rating      Int         @default(0)
+  id_user     String
+  id_store    String
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  user        Users       @relation(fields: [id_user], references: [id_user], onDelete: Cascade)
+  store       Stores      @relation(fields: [id_store], references: [id_store], onDelete: Cascade)
+  @@unique([id_user, id_store])
+}
+
+model ProductComment {
+  id          String      @id @default(cuid())
+  comment     String
+  id_user     String
+  id_product  String
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  user        Users       @relation(fields: [id_user], references: [id_user], onDelete: Cascade)
+  product     Products    @relation(fields: [id_product], references: [id_product], onDelete: Cascade)
+}
+
+model StoreComment {
+  id          String      @id @default(cuid())
+  comment     String
+  id_user     String
+  id_store    String
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  user        Users       @relation(fields: [id_user], references: [id_user], onDelete: Cascade)
+  store       Stores      @relation(fields: [id_store], references: [id_store], onDelete: Cascade)
+}
+
+model Message {
+  id          String      @id @default(cuid())
+  content     String
+  id_user     String
+  id_store    String
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  user        Users       @relation(fields: [id_user], references: [id_user], onDelete: Cascade)
+  store       Stores      @relation(fields: [id_store], references: [id_store], onDelete: Cascade)
 }
 
 enum Role {

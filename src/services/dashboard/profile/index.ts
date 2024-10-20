@@ -25,6 +25,7 @@ export const getProfileUser = async () => {
         fullname: response.data.data.fullname || "",
         address: response.data.data.address || "",
         number_phone: response.data.data.number_phone || "",
+        balance: response.data.data.balance || "",
       };
     }
   } catch (error) {
@@ -45,6 +46,7 @@ export const useProfileData = () => {
     fullname: "",
     address: "",
     number_phone: "",
+    balance: 0,
   });
   const [loading, setLoading] = useState(false);
 

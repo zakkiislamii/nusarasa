@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { IMAGES } from "@/components/navbar/components/index";
+
 export default function Member() {
   return (
     <>
