@@ -1,5 +1,4 @@
 "use client";
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react";
 import { useGetAllStores } from "@/services/homepage/stores";
 import LoadingState from "@/components/loading";
@@ -10,7 +9,8 @@ import { useHandleCardHome } from "@/services/homepage/cardHome";
 export default function Body() {
   const { stores, isLoading, error } = useGetAllStores();
   const [selectedStore, setSelectedStore] = useState<Store | null>(null);
-  const { handleQuantityChange, handleAddToCart } = useHandleCardHome();
+  const { handleQuantityChange, handleAddToCart, isAuthenticated } =
+    useHandleCardHome();
 
   if (isLoading) {
     return <LoadingState />;
@@ -20,7 +20,11 @@ export default function Body() {
     return <div className="text-center py-8 text-red-500">Error: {error}</div>;
   }
 
-  const filteredStores = stores as any as Store[];
+  if (!isAuthenticated) {
+    return <div className="text-center py-8">Please login to continue</div>;
+  }
+
+  const filteredStores = stores as Store[];
 
   return (
     <div className="container mx-auto px-4 py-8">

@@ -3,9 +3,10 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { icons } from "../../../../components/pages/data-diri";
 import { onSubmit, handleChange } from "@/services/data-diri";
-import { dataDiriFormData } from "../../../../components/pages/data-diri";
+
 import { useState } from "react";
 import Button from "@/components/buttoms/buttom submit";
+import { dataDiriFormData } from "@/interfaces/data-diri";
 
 const data: dataDiriFormData = {
   fullname: "",

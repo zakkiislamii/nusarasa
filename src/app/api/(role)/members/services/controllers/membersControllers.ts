@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { decrypt } from "@/utils/token/token";
 import { NextRequest, NextResponse } from "next/server";
-import { addToCart } from "../queries/membersQueries";
+import { addToCart, getCart } from "../queries/membersQueries";
 
 export const addCartMembers = async (req: NextRequest) => {
   const apiKey = req.headers.get("x-api-key");
@@ -157,6 +157,83 @@ export const addCartMembers = async (req: NextRequest) => {
         status: "Error",
         message: "Internal server error",
         error: error.message,
+      },
+      {
+        status: 500,
+      }
+    );
+  }
+};
+
+export const getCartByToken = async (req: NextRequest) => {
+  const apiKey = req.headers.get("x-api-key");
+  if (apiKey !== process.env.NEXT_PUBLIC_API_KEY) {
+    return NextResponse.json(
+      {
+        code: 401,
+        status: "Failed",
+        error: "Unauthorized",
+        message: "Invalid API key",
+      },
+      { status: 401 }
+    );
+  }
+
+  if (req.method !== "GET") {
+    return NextResponse.json(
+      {
+        code: 405,
+        status: "Failed",
+        message: "Method not allowed",
+        error: "The method is wrong",
+      },
+      { status: 405 }
+    );
+  }
+
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return NextResponse.json(
+      {
+        code: 401,
+        status: "Failed",
+        error: "Unauthorized",
+        message: "Missing or invalid Bearer token",
+      },
+      { status: 401 }
+    );
+  }
+  const token = authHeader.split(" ")[1];
+  const decodedToken = await decrypt(token);
+  if (!decodedToken || decodedToken.user.role !== "member") {
+    return NextResponse.json(
+      {
+        code: 403,
+        status: "Failed",
+        error: "Forbidden",
+        message: "Access denied. Only members can access this resource.",
+      },
+      { status: 403 }
+    );
+  }
+
+  try {
+    const id_user = decodedToken.user.id as string;
+    console.log("ini id nya: ", decodedToken.user.id);
+    const data = await getCart({ userId: id_user });
+    return NextResponse.json({
+      code: 200,
+      status: "Success",
+      message: "Success to get member cart",
+      data,
+    });
+  } catch (e) {
+    return NextResponse.json(
+      {
+        code: 500,
+        status: "Error",
+        message: "Internal server error",
+        e,
       },
       {
         status: 500,

@@ -11,7 +11,7 @@ if (process.env.NODE_ENV === "production") {
   prisma = (global as any).prisma;
 }
 
-export const createOrGetActiveCart = async (userId: string) => {
+export const createOrGetActiveCart = async ({ userId }: { userId: string }) => {
   let cart = await prisma.cart.findFirst({
     where: {
       id_user: userId,
@@ -31,6 +31,24 @@ export const createOrGetActiveCart = async (userId: string) => {
   return cart;
 };
 
+export const getCart = async ({ userId }: { userId: string }) => {
+  const data = await prisma.cart.findFirst({
+    where: {
+      id_user: userId,
+      status: "active",
+    },
+    include: {
+      items: {
+        include: {
+          product: true, // Mendapatkan informasi produk
+          store: true, // Mendapatkan informasi toko
+        },
+      },
+    },
+  });
+  return data;
+};
+
 export const addToCart = async ({
   userId,
   productId,
@@ -46,7 +64,7 @@ export const addToCart = async ({
   }
 
   return await prisma.$transaction(async (tx) => {
-    const cart = await createOrGetActiveCart(userId);
+    const cart = await createOrGetActiveCart({ userId });
 
     const product = await tx.products.findUnique({
       where: { id_product: productId },
@@ -76,7 +94,7 @@ export const addToCart = async ({
     const existingItem = await tx.cartItem.findUnique({
       where: {
         id_cart_id_product: {
-          id_cart: cart.id,
+          id_cart: cart.id_cart,
           id_product: productId,
         },
       },
@@ -106,7 +124,7 @@ export const addToCart = async ({
       if (existingItem) {
         return await tx.cartItem.update({
           where: {
-            id: existingItem.id,
+            id_cartItem: existingItem.id_cartItem,
           },
           data: {
             quantity: existingItem.quantity + quantity,
@@ -120,7 +138,7 @@ export const addToCart = async ({
         return await tx.cartItem.create({
           data: {
             cart: {
-              connect: { id: cart.id },
+              connect: { id_cart: cart.id_cart },
             },
             product: {
               connect: { id_product: productId },
@@ -154,7 +172,7 @@ export const updateCartItemQuantity = async (
 
   return await prisma.$transaction(async (tx) => {
     const currentCartItem = await tx.cartItem.findUnique({
-      where: { id: cartItemId },
+      where: { id_cartItem: cartItemId },
       include: { product: true },
     });
 
@@ -192,7 +210,7 @@ export const updateCartItemQuantity = async (
     });
 
     return await tx.cartItem.update({
-      where: { id: cartItemId },
+      where: { id_cartItem: cartItemId },
       data: { quantity: newQuantity },
       include: {
         product: true,
@@ -205,7 +223,7 @@ export const updateCartItemQuantity = async (
 export const removeFromCart = async (cartItemId: string) => {
   return await prisma.$transaction(async (tx) => {
     const cartItem = await tx.cartItem.findUnique({
-      where: { id: cartItemId },
+      where: { id_cartItem: cartItemId },
       select: {
         quantity: true,
         id_product: true,
@@ -232,9 +250,19 @@ export const removeFromCart = async (cartItemId: string) => {
     });
 
     return await tx.cartItem.delete({
-      where: { id: cartItemId },
+      where: { id_cartItem: cartItemId },
     });
   });
+};
+
+export const getUserIdByToken = async ({ token }: { token: string }) => {
+  const data = await prisma.users.findUnique({
+    where: { token: token },
+    select: {
+      id_user: true,
+    },
+  });
+  return data;
 };
 
 export const getCartItems = async (userId: string) => {

@@ -1,7 +1,8 @@
 import { toast } from "sonner";
 import axios from "axios";
-import { dataDiriFormData } from "@/components/pages/data-diri";
+
 import { getSession } from "@/utils/token/token";
+import { dataDiriFormData } from "@/interfaces/data-diri";
 
 export const handleChange = (
   e: React.ChangeEvent<HTMLInputElement>,

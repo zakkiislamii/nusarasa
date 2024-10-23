@@ -26,7 +26,7 @@ model Users {
   productComments   ProductComment[]
   storeComments     StoreComment[]
   messages          Message[]
-  carts             Cart[] 
+  carts             Cart[]
 }
 
 model Stores {
@@ -40,7 +40,7 @@ model Stores {
   ratings    StoreRating[]
   comments   StoreComment[]
   messages   Message[]
-    cartItems  CartItem[] 
+  cartItems  CartItem[]
 }
 
 model Products {
@@ -58,26 +58,26 @@ model Products {
 }
 
 model Cart {
-  id          String      @id @default(cuid())
-  id_user     String
-  status      CartStatus  @default(active)
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  user        Users       @relation(fields: [id_user], references: [id_user], onDelete: Cascade)
-  items       CartItem[]
+  id_cart      String      @id @default(cuid()) @map("id_cart")
+  id_user      String
+  status       CartStatus  @default(active)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  user         Users       @relation(fields: [id_user], references: [id_user], onDelete: Cascade)
+  items        CartItem[]
 }
 
 model CartItem {
-  id          String      @id @default(cuid())
-  quantity    Int
-  id_cart     String
-  id_product  String
-  id_store    String     
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  cart        Cart        @relation(fields: [id_cart], references: [id], onDelete: Cascade)
-  product     Products    @relation(fields: [id_product], references: [id_product], onDelete: Cascade)
-  store       Stores      @relation(fields: [id_store], references: [id_store], onDelete: Cascade)
+  id_cartItem  String      @id @default(cuid()) @map("id_cartItem")
+  quantity     Int
+  id_cart      String
+  id_product   String
+  id_store     String     
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  cart         Cart        @relation(fields: [id_cart], references: [id_cart], onDelete: Cascade)
+  product      Products    @relation(fields: [id_product], references: [id_product], onDelete: Cascade)
+  store        Stores      @relation(fields: [id_store], references: [id_store], onDelete: Cascade)
   @@unique([id_cart, id_product])
 }
 
@@ -93,6 +93,7 @@ enum CartStatus {
   completed
   cancelled
 }
+
 
 model ProductRating {
   id          String      @id @default(cuid())
