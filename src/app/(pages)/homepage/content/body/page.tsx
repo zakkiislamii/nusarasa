@@ -4,25 +4,35 @@ import React, { useState } from "react";
 import { useGetAllStores } from "@/services/homepage/stores";
 import LoadingState from "@/components/loading";
 import { Product, Store } from "@/interfaces/homepage/stores";
+import CardHome from "@/components/cardHome";
 
 export default function Body() {
   const { stores, isLoading, error } = useGetAllStores();
   const [selectedStore, setSelectedStore] = useState<Store | null>(null);
+  const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
 
   if (isLoading) {
-    return (
-      <>
-        <LoadingState />
-      </>
-    );
+    return <LoadingState />;
   }
 
   if (error) {
     return <div className="text-center py-8 text-red-500">Error: {error}</div>;
   }
 
-  // Filtered list of stores
   const filteredStores = stores as any as Store[];
+
+  const handleQuantityChange = (productId: string, quantity: number) => {
+    setQuantities((prev) => ({
+      ...prev,
+      [productId]: quantity,
+    }));
+  };
+
+  const handleAddToCart = (product: Product) => {
+    const quantity = quantities[product.id_product] || 0;
+    // Implement your add to cart logic here
+    console.log(`Added ${quantity} of ${product.product_name} to cart`);
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -53,7 +63,7 @@ export default function Body() {
         <div className="bg-white p-6 rounded-lg shadow-md">
           <button
             className="mb-4 bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600"
-            onClick={() => setSelectedStore(null)} // Go back to store list
+            onClick={() => setSelectedStore(null)}
           >
             Back to Stores
           </button>
@@ -62,19 +72,14 @@ export default function Body() {
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {selectedStore.products.map((product: Product) => (
-              <div
+              <CardHome
                 key={product.id_product}
-                className="bg-white rounded-lg shadow-md overflow-hidden transition-transform transform hover:scale-105"
-              >
-                <div className="p-4">
-                  <h3 className="text-xl font-semibold mb-2 truncate">
-                    {product.product_name}
-                  </h3>
-                  <p className="text-lg font-bold text-green-600 mb-2">
-                    Rp {product.price.toLocaleString()}
-                  </p>
-                </div>
-              </div>
+                product={product}
+                onQuantityChange={(quantity) =>
+                  handleQuantityChange(product.id_product, quantity)
+                }
+                onAddToCart={() => handleAddToCart(product)}
+              />
             ))}
           </div>
         </div>

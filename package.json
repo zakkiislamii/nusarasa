@@ -29,6 +29,7 @@
     "cookie": "^0.7.2",
     "express": "^2.5.11",
     "firebase": "^10.13.2",
+    "flowbite-react": "^0.10.2",
     "js-cookie": "^3.0.5",
     "jsonwebtoken": "^9.0.2",
     "jwt-decode": "^4.0.0",
