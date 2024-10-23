@@ -5,11 +5,12 @@ import { useGetAllStores } from "@/services/homepage/stores";
 import LoadingState from "@/components/loading";
 import { Product, Store } from "@/interfaces/homepage/stores";
 import CardHome from "@/components/cardHome";
+import { useHandleCardHome } from "@/services/homepage/cardHome";
 
 export default function Body() {
   const { stores, isLoading, error } = useGetAllStores();
   const [selectedStore, setSelectedStore] = useState<Store | null>(null);
-  const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
+  const { handleQuantityChange, handleAddToCart } = useHandleCardHome();
 
   if (isLoading) {
     return <LoadingState />;
@@ -20,19 +21,6 @@ export default function Body() {
   }
 
   const filteredStores = stores as any as Store[];
-
-  const handleQuantityChange = (productId: string, quantity: number) => {
-    setQuantities((prev) => ({
-      ...prev,
-      [productId]: quantity,
-    }));
-  };
-
-  const handleAddToCart = (product: Product) => {
-    const quantity = quantities[product.id_product] || 0;
-    // Implement your add to cart logic here
-    console.log(`Added ${quantity} of ${product.product_name} to cart`);
-  };
 
   return (
     <div className="container mx-auto px-4 py-8">

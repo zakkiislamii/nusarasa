@@ -27,6 +27,7 @@ export const findManyProductsByToken = async (token: string) => {
               id_product: true,
               product_name: true,
               price: true,
+              quantity: true,
             },
           },
         },

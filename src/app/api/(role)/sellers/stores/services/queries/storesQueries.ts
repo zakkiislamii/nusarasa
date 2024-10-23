@@ -28,6 +28,7 @@ export const findManyStores = async () => {
           id_product: true,
           product_name: true,
           price: true,
+          quantity: true,
         },
       },
     },

@@ -9,6 +9,7 @@ export interface Product {
   id_product: string;
   product_name: string;
   price: number;
+  quantity: number;
 }
 
 export interface FormattedProduct {

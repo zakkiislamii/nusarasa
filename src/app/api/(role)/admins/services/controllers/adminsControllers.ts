@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { decrypt } from "@/utils/token/token";
-// Ensure this import is correct
 import { NextRequest, NextResponse } from "next/server";
 import { getAllUsersByRole } from "../queries/adminsQueries";
 
