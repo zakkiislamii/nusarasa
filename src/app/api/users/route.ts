@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import {
   getAllUsers,
   updatePersonalData,
-} from "../users/services/controllers/userController";
+} from "../../../services/api/controllers/users/userController";
 
 export const GET = async (req: NextRequest) => {
   return await getAllUsers(req);

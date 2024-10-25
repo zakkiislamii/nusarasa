@@ -10,7 +10,7 @@ import {
   editProfileUser,
   FindUserBasedOnTheToken,
   saveToken,
-} from "../queries/userQueries";
+} from "../../queries/users/userQueries";
 import { NextResponse, NextRequest } from "next/server";
 import bcrypt from "bcrypt/";
 import { encrypt, getSession, getSessionForCheck } from "@/utils/token/token";

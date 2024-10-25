@@ -1,5 +1,5 @@
+import { findManyStores } from "@/services/api/queries/role/sellers/stores/storesQueries";
 import { NextRequest, NextResponse } from "next/server";
-import { findManyStores } from "../queries/storesQueries";
 
 export const getAllStores = async (req: NextRequest) => {
   const apiKey = req.headers.get("x-api-key");

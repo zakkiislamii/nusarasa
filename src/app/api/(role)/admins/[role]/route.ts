@@ -1,5 +1,5 @@
+import { getAllUsersForAdmins } from "@/services/api/controllers/role/admins/adminsControllers";
 import { NextRequest } from "next/server";
-import { getAllUsersForAdmins } from "../services/controllers/adminsControllers";
 
 export const GET = async (
   req: NextRequest,

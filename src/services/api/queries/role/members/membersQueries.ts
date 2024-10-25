@@ -255,16 +255,6 @@ export const removeFromCart = async (cartItemId: string) => {
   });
 };
 
-export const getUserIdByToken = async ({ token }: { token: string }) => {
-  const data = await prisma.users.findUnique({
-    where: { token: token },
-    select: {
-      id_user: true,
-    },
-  });
-  return data;
-};
-
 export const getCartItems = async (userId: string) => {
   const cart = await prisma.cart.findFirst({
     where: {

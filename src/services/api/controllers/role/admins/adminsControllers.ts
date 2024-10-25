@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { getAllUsersByRole } from "@/services/api/queries/role/admins/adminsQueries";
 import { decrypt } from "@/utils/token/token";
 import { NextRequest, NextResponse } from "next/server";
-import { getAllUsersByRole } from "../queries/adminsQueries";
 
 export const getAllUsersForAdmins = async (req: NextRequest, role: string) => {
   const apiKey = req.headers.get("x-api-key");

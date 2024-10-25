@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { deleteUser } from "../../users/services/controllers/userController";
+import { deleteUser } from "../../../../services/api/controllers/users/userController";
 
 export const DELETE = async (
   req: NextRequest,

@@ -1,6 +1,7 @@
+import { findManyProductsByToken } from "@/services/api/queries/role/sellers/products/productsQueries";
 import { decrypt } from "@/utils/token/token";
 import { NextRequest, NextResponse } from "next/server";
-import { findManyProductsByToken } from "../queries/productsQueries";
+
 
 export const getAllProductsByToken = async (req: NextRequest) => {
   const apiKey = req.headers.get("x-api-key");
