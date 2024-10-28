@@ -7,7 +7,7 @@ import {
   NAV_LINKS,
   IMAGES,
   NAV_LINKS_PRODUCTS,
-} from "../../../../components/navbar/components/index";
+} from "../../../../components/navbar/index";
 import { useScrollHandler, useLogout } from "@/services/auth/login";
 import { useCheckLoginUser } from "@/services/auth/checkLogin";
 import Member from "@/components/navbar/role/member/page";

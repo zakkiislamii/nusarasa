@@ -19,3 +19,10 @@ export interface FormattedProduct {
   product_name: string;
   price: number;
 }
+
+// Create a store management store
+export interface StoreState {
+  stores: Store[];
+  setStores: (stores: Store[]) => void;
+  updateProductStock: (productId: string, quantityChange: number) => void;
+}

@@ -1,7 +1,8 @@
-import { Product } from "@/interfaces/homepage/stores";
+import { Product } from "@/interfaces/homepage";
 
 export interface CardHomeProps {
   product: Product;
-  onQuantityChange?: (quantity: number) => void;
-  onAddToCart?: () => void;
+  quantity: number;
+  onQuantityChange: (quantity: number) => void;
+  onAddToCart: () => void;
 }
