@@ -32,7 +32,7 @@ export const createOrGetActiveCart = async ({ userId }: { userId: string }) => {
 };
 
 export const getCart = async ({ userId }: { userId: string }) => {
-  const data = await prisma.cart.findFirst({
+  const cart = await prisma.cart.findFirst({
     where: {
       id_user: userId,
       status: "active",
@@ -40,13 +40,22 @@ export const getCart = async ({ userId }: { userId: string }) => {
     include: {
       items: {
         include: {
-          product: true, // Mendapatkan informasi produk
-          store: true, // Mendapatkan informasi toko
+          product: true,
+          store: true,
         },
       },
     },
   });
-  return data;
+
+  if (!cart) {
+    return null;
+  }
+
+  return {
+    id_cart: cart.id_cart,
+    status: cart.status,
+    items: cart.items,
+  };
 };
 
 export const addToCart = async ({
@@ -272,4 +281,123 @@ export const getCartItems = async (userId: string) => {
   });
 
   return cart;
+};
+
+export const checkout = async (id_user: string, id_cart: string) => {
+  try {
+    return await prisma.$transaction(async (tx) => {
+      // 1. Dapatkan cart dengan items dan product details
+      const cart = await tx.cart.findFirst({
+        where: {
+          id_cart: id_cart,
+          id_user: id_user,
+          status: "active",
+        },
+        include: {
+          items: {
+            include: {
+              product: true,
+            },
+          },
+          user: true,
+        },
+      });
+
+      if (!cart) {
+        throw new Error("Cart not found or inactive");
+      }
+
+      // 2. Hitung total harga
+      const totalAmount = cart.items.reduce((total, item) => {
+        return total + item.product.price * item.quantity;
+      }, 0);
+
+      // 3. Cek balance user
+      if (cart.user.balance < totalAmount) {
+        throw new Error("Insufficient balance");
+      }
+
+      // 4. Update stok produk
+      for (const item of cart.items) {
+        const product = await tx.products.findUnique({
+          where: { id_product: item.product.id_product },
+        });
+
+        if (!product) {
+          throw new Error(
+            `Produk dengan ID ${item.product.id_product} tidak ditemukan`
+          );
+        }
+
+        if (product.quantity < item.quantity) {
+          throw new Error(
+            `Stok produk ${product.product_name} tidak mencukupi`
+          );
+        }
+
+        // Kurangi stok produk
+        await tx.products.update({
+          where: { id_product: item.product.id_product },
+          data: {
+            quantity: product.quantity - item.quantity,
+          },
+        });
+      }
+
+      // 5. Update balance user
+      await tx.users.update({
+        where: { id_user: id_user },
+        data: {
+          balance: cart.user.balance - totalAmount,
+        },
+      });
+
+      // 6. Update status cart
+      await tx.cart.update({
+        where: { id_cart: id_cart },
+        data: {
+          status: "checkout",
+        },
+        include: {
+          items: {
+            include: {
+              product: true,
+              store: true,
+            },
+          },
+        },
+      });
+
+      // 7. Hapus cart items
+      await tx.cartItem.deleteMany({
+        where: {
+          id_cart: id_cart,
+        },
+      });
+
+      // 8. Ambil data cart terbaru setelah items dihapus
+      const finalCart = await tx.cart.findUnique({
+        where: {
+          id_cart: id_cart,
+        },
+        include: {
+          items: {
+            include: {
+              product: true,
+              store: true,
+            },
+          },
+        },
+      });
+
+      // 9. Return updated data
+      return {
+        cart: finalCart,
+        totalAmount,
+        remainingBalance: cart.user.balance - totalAmount,
+      };
+    });
+  } catch (error) {
+    throw error;
+  }
 };

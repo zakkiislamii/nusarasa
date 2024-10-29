@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import { useGetAllStores } from "@/services/homepage/stores";
 import LoadingState from "@/components/loading";
 import { Product, Store } from "@/interfaces/homepage";
-import CardHome from "@/components/cardHome";
+import CardHome from "@/components/card/cardHome";
 import { useHandleCardHome } from "@/services/homepage/cardHome";
 
 export default function Body() {

@@ -26,9 +26,15 @@ export interface Store {
 
 export interface CartItem {
   id_cartItem: string;
+  id_cart: string;
   quantity: number;
   product: Product;
   store: Store;
+}
+
+export interface CheckoutRequest {
+  id_user: string;
+  id_cart: string;
 }
 
 export interface EditingState {

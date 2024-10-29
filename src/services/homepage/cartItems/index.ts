@@ -1,7 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { getSession } from "@/utils/token/token";
-import { CartItem, EditingState, QuantityState } from "@/interfaces/cart";
+import { decrypt, getSession } from "@/utils/token/token";
+import {
+  CartItem,
+  CheckoutRequest,
+  EditingState,
+  QuantityState,
+} from "@/interfaces/cart";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -74,11 +79,23 @@ export const useCartItemsUser = () => {
     }, 0);
   };
 
-  const fetchCartItems = async () => {
+  const handleCheckOut = async () => {
     const token = await getSession();
-
+    if (!token) {
+      toast.error("Please login first");
+      return;
+    }
+    const decodedToken = await decrypt(token);
+    if (!decodedToken?.user?.id) {
+      toast.error("Invalid user session");
+      return;
+    }
+    const checkoutData: CheckoutRequest = {
+      id_user: decodedToken.user.id,
+      id_cart: cartItems[0].id_cart,
+    };
     try {
-      const res = await axios.get("/api/members/cart", {
+      const res = await axios.post("/api/members/cart", checkoutData, {
         headers: {
           "Content-Type": "application/json",
           "x-api-key": process.env.NEXT_PUBLIC_API_KEY,
@@ -86,17 +103,51 @@ export const useCartItemsUser = () => {
         },
       });
       if (res.status === 200) {
-        setCartItems(res.data.data.items);
+        toast.info("Check Out successfully");
+        fetchCartItems();
       }
-    } catch (err) {
-      toast.error(`${err}`);
+    } catch (e) {
+      toast.error(`${e}`);
+    }
+  };
+  const fetchCartItems = async () => {
+    const token = await getSession();
+
+    try {
+      const res = await axios.get("/api/members/cart-items", {
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.NEXT_PUBLIC_API_KEY,
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const {
+        data: { data },
+      } = res;
+
+      if (!data) {
+        throw new Error("No cart data received");
+      }
+
+      // Pastikan items ada sebelum mengaksesnya
+      if (!data.items || !Array.isArray(data.items)) {
+        setCartItems([]); // Set empty array jika tidak ada items
+        return;
+      }
+
+      setCartItems(data.items);
+    } catch (error) {
+      console.error("Error fetching cart items:", error);
+      setCartItems([]); // Set empty array pada error
+      // Tambahkan error handling sesuai kebutuhan (toast, alert, dll)
     }
   };
 
   const handleRemoveItem = async (id_cartItem: string) => {
     try {
       const token = await getSession();
-      const res = await axios.delete(`/api/members/cart/${id_cartItem}`, {
+      const res = await axios.delete(`/api/members/cart-items/${id_cartItem}`, {
         headers: {
           "Content-Type": "application/json",
           "x-api-key": process.env.NEXT_PUBLIC_API_KEY,
@@ -116,7 +167,7 @@ export const useCartItemsUser = () => {
     try {
       const token = await getSession();
       const res = await axios.put(
-        `/api/members/cart/${id_cartItem}`,
+        `/api/members/cart-items/${id_cartItem}`,
         { quantity },
         {
           headers: {
@@ -152,5 +203,6 @@ export const useCartItemsUser = () => {
     calculateSubtotal,
     handleRemoveItem,
     handleUpdateItem,
+    handleCheckOut,
   };
 };

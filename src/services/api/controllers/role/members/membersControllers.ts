@@ -3,6 +3,7 @@ import { decrypt } from "@/utils/token/token";
 import { NextRequest, NextResponse } from "next/server";
 import {
   addToCart,
+  checkout,
   getCart,
   removeFromCart,
   updateCartItemQuantity,
@@ -208,6 +209,7 @@ export const getCartByToken = async (req: NextRequest) => {
       { status: 401 }
     );
   }
+
   const token = authHeader.split(" ")[1];
   const decodedToken = await decrypt(token);
   if (!decodedToken || decodedToken.user.role !== "member") {
@@ -224,13 +226,25 @@ export const getCartByToken = async (req: NextRequest) => {
 
   try {
     const id_user = decodedToken.user.id as string;
-    console.log("ini id nya: ", decodedToken.user.id);
-    const data = await getCart({ userId: id_user });
+    const cartData = await getCart({ userId: id_user });
+
+    if (!cartData) {
+      return NextResponse.json(
+        {
+          code: 404,
+          status: "Failed",
+          error: "Not Found",
+          message: "Cart not found",
+        },
+        { status: 404 }
+      );
+    }
+
     return NextResponse.json({
       code: 200,
       status: "Success",
       message: "Success to get member cart",
-      data,
+      data: cartData,
     });
   } catch (e) {
     return NextResponse.json(
@@ -238,11 +252,9 @@ export const getCartByToken = async (req: NextRequest) => {
         code: 500,
         status: "Error",
         message: "Internal server error",
-        e,
+        error: e instanceof Error ? e.message : "Unknown error",
       },
-      {
-        status: 500,
-      }
+      { status: 500 }
     );
   }
 };
@@ -495,6 +507,147 @@ export const updateCartItem = async (req: NextRequest, id: string) => {
     }
 
     // Default error handler
+    return NextResponse.json(
+      {
+        code: 500,
+        status: "Error",
+        message: "Internal server error",
+        error: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 }
+    );
+  }
+};
+
+export const checkoutCart = async (req: NextRequest) => {
+  const apiKey = req.headers.get("x-api-key");
+  if (apiKey !== process.env.NEXT_PUBLIC_API_KEY) {
+    return NextResponse.json(
+      {
+        code: 401,
+        status: "Failed",
+        error: "Unauthorized",
+        message: "Invalid API key",
+      },
+      { status: 401 }
+    );
+  }
+
+  if (req.method !== "POST") {
+    return NextResponse.json(
+      {
+        code: 405,
+        status: "Failed",
+        message: "Method not allowed",
+        error: "The method is wrong",
+      },
+      { status: 405 }
+    );
+  }
+
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return NextResponse.json(
+      {
+        code: 401,
+        status: "Failed",
+        error: "Unauthorized",
+        message: "Missing or invalid Bearer token",
+      },
+      { status: 401 }
+    );
+  }
+
+  const token = authHeader.split(" ")[1];
+  const decodedToken = await decrypt(token);
+  if (!decodedToken || decodedToken.user.role !== "member") {
+    return NextResponse.json(
+      {
+        code: 403,
+        status: "Failed",
+        error: "Forbidden",
+        message: "Access denied. Only members can access this resource.",
+      },
+      { status: 403 }
+    );
+  }
+
+  try {
+    const { id_user, id_cart } = await req.json();
+    if (!id_user || !id_cart) {
+      return NextResponse.json(
+        {
+          code: 400,
+          status: "Failed",
+          error: "Bad Request",
+          message: "All fields are required",
+        },
+        { status: 400 }
+      );
+    }
+
+    const result = await checkout(id_user, id_cart);
+
+    return NextResponse.json(
+      {
+        code: 200,
+        status: "Success",
+        message: "Cart item has been checked out",
+        data: result,
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    // Handle specific errors dari query
+    if (error instanceof Error) {
+      switch (error.message) {
+        case "Cart not found or inactive":
+          return NextResponse.json(
+            {
+              code: 404,
+              status: "Failed",
+              error: "Not Found",
+              message: "Cart not found or inactive",
+            },
+            { status: 404 }
+          );
+        case "Insufficient balance":
+          return NextResponse.json(
+            {
+              code: 400,
+              status: "Failed",
+              error: "Bad Request",
+              message: "Insufficient balance to complete checkout",
+            },
+            { status: 400 }
+          );
+        default:
+          if (error.message.includes("Produk dengan ID")) {
+            return NextResponse.json(
+              {
+                code: 404,
+                status: "Failed",
+                error: "Not Found",
+                message: error.message,
+              },
+              { status: 404 }
+            );
+          }
+          if (error.message.includes("Stok produk")) {
+            return NextResponse.json(
+              {
+                code: 400,
+                status: "Failed",
+                error: "Bad Request",
+                message: error.message,
+              },
+              { status: 400 }
+            );
+          }
+      }
+    }
+
+    // Default error response
     return NextResponse.json(
       {
         code: 500,

@@ -22,6 +22,7 @@ const CartItems: FC<CartItemsProps> = ({ open, setOpen }) => {
     handleKeyPress,
     calculateSubtotal,
     handleRemoveItem,
+    handleCheckOut,
   } = useCartItemsUser();
 
   return (
@@ -183,6 +184,7 @@ const CartItems: FC<CartItemsProps> = ({ open, setOpen }) => {
                   </p>
                   <div className="mt-6">
                     <button
+                      onClick={handleCheckOut}
                       disabled={cartItems.length === 0}
                       className="flex w-full items-center justify-center rounded-md border border-transparent bg-orange-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-orange-700 disabled:opacity-50"
                     >

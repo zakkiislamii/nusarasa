@@ -41,7 +41,7 @@ export const useHandleCardHome = () => {
   const addToCart = async (cartData: FormAddToCart): Promise<boolean> => {
     const token = await getSession();
     try {
-      const res = await axios.post("/api/members/cart", cartData, {
+      const res = await axios.post("/api/members/cart-items", cartData, {
         headers: {
           "Content-Type": "application/json",
           "x-api-key": process.env.NEXT_PUBLIC_API_KEY,
