@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+"use client";
 import { getSession } from "@/utils/token/token";
 import { CartItem, EditingState, QuantityState } from "@/interfaces/cart";
 import axios from "axios";
@@ -17,7 +18,6 @@ export const useCartItemsUser = () => {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(price);
-
     return formatted.replace(/\s+/g, "");
   };
 

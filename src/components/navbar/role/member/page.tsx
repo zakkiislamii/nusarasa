@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 import { IMAGES } from "@/components/navbar/index";
-import CartItems from "@/app/(pages)/(components)/cartItems/page";
+
 import { useState } from "react";
+import CartItems from "@/components/cartItem";
 
 export default function Member() {
   const [isCartOpen, setIsCartOpen] = useState(false);
