@@ -78,7 +78,6 @@ export const useHandleCardHome = () => {
     }
 
     const cartData: FormAddToCart = {
-      user_id: userId,
       product_id: product.id_product,
       quantity: quantity,
     };

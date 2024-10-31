@@ -17,6 +17,7 @@ import bcrypt from "bcrypt/";
 import { encrypt, getSession, getSessionForCheck } from "@/utils/token/token";
 import {
   badRequestResponse,
+  costumHandler,
   errorHandler,
   methodNotAllowedResponse,
   successResponse,
@@ -57,29 +58,11 @@ export const register = async (req: NextRequest) => {
     const checked = await existingUser({ email, username });
     if (checked) {
       if (checked.username === username) {
-        return NextResponse.json(
-          {
-            code: 409,
-            status: "Failed",
-            message: "Username already exists",
-          },
-          {
-            status: 409,
-          }
-        );
+        return costumHandler(409, "Username already exists");
       }
 
       if (checked.email === email) {
-        return NextResponse.json(
-          {
-            code: 409,
-            status: "Failed",
-            message: "Email already exists",
-          },
-          {
-            status: 409,
-          }
-        );
+        return costumHandler(409, "Email already exists");
       }
     }
 
@@ -112,31 +95,11 @@ export const deleteUser = async (req: NextRequest, id: string) => {
     }
     const checked = await existingDeleteUser({ id });
     if (!checked) {
-      return NextResponse.json(
-        {
-          code: 404,
-          status: "Failed",
-          error: "User Not Found",
-          message: "User not found",
-        },
-        {
-          status: 404,
-        }
-      );
+      return costumHandler(404, "User not found", "User not found");
     } else {
       const deletedUser = await deleterUserById({ id });
       if (!deletedUser) {
-        return NextResponse.json(
-          {
-            code: 404,
-            status: "Failed",
-            error: "Not Found",
-            message: "User not found",
-          },
-          {
-            status: 404,
-          }
-        );
+        return costumHandler(404, "Not found", "User not found");
       } else {
         return successResponse("User has been deleted");
       }
@@ -159,27 +122,19 @@ export const login = async (req: NextRequest) => {
     const { username, password } = await req.json();
 
     if (!username || !password) {
-      return NextResponse.json(
-        {
-          code: 400,
-          status: "failed",
-          message: "Username and password are required",
-          error: "Username and password have not been entered",
-        },
-        { status: 400 }
+      return costumHandler(
+        400,
+        "Username and password are required",
+        "Username and password have not been entered"
       );
     }
 
     const user = await findUser({ username });
     if (!user?.username) {
-      return NextResponse.json(
-        {
-          code: 401,
-          status: "failed",
-          message: "Invalid Username or Password",
-          error: "Username and password not found",
-        },
-        { status: 401 }
+      return costumHandler(
+        401,
+        "Invalid Username or Password",
+        "Username and password not found"
       );
     }
 
@@ -188,14 +143,10 @@ export const login = async (req: NextRequest) => {
       user.password as string
     );
     if (!isPasswordValid) {
-      return NextResponse.json(
-        {
-          code: 401,
-          status: "failed",
-          message: "Invalid Username or Password",
-          error: "Username and password not found",
-        },
-        { status: 401 }
+      return costumHandler(
+        401,
+        "Invalid Username or Password",
+        "Username and password not found"
       );
     }
 
@@ -311,14 +262,13 @@ export const editProfile = async (req: NextRequest) => {
   if (req.method !== "POST") {
     return methodNotAllowedResponse();
   }
+  // Get Bearer token from header
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return unauthorizedTokenResponse();
+  }
 
   try {
-    // Get Bearer token from header
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return unauthorizedTokenResponse();
-    }
-
     const token = authHeader.split(" ")[1];
     const body = await req.json();
     const { fullname, address, number_phone, email, username } = body;
@@ -329,17 +279,11 @@ export const editProfile = async (req: NextRequest) => {
       username,
     });
     if (validationResult.exists) {
-      return NextResponse.json(
-        {
-          code: 409,
-          status: "Failed",
-          message: `${
-            validationResult.field === "email" ? "Email" : "Username"
-          } already exists`,
-        },
-        {
-          status: 409,
-        }
+      return costumHandler(
+        409,
+        `${
+          validationResult.field === "email" ? "Email" : "Username"
+        } already exists`
       );
     }
 

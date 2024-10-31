@@ -1,6 +1,5 @@
 // Interface yang sudah ada
 export interface FormAddToCart {
-  user_id: string;
   product_id: string;
   quantity: number;
 }
@@ -33,7 +32,6 @@ export interface CartItem {
 }
 
 export interface CheckoutRequest {
-  id_user: string;
   id_cart: string;
 }
 

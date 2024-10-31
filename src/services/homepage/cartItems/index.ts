@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { decrypt, getSession } from "@/utils/token/token";
+import { getSession } from "@/utils/token/token";
 import {
   CartItem,
   CheckoutRequest,
@@ -85,13 +85,8 @@ export const useCartItemsUser = () => {
       toast.error("Please login first");
       return;
     }
-    const decodedToken = await decrypt(token);
-    if (!decodedToken?.user?.id) {
-      toast.error("Invalid user session");
-      return;
-    }
+
     const checkoutData: CheckoutRequest = {
-      id_user: decodedToken.user.id,
       id_cart: cartItems[0].id_cart,
     };
     try {
@@ -112,7 +107,6 @@ export const useCartItemsUser = () => {
   };
   const fetchCartItems = async () => {
     const token = await getSession();
-
     try {
       const res = await axios.get("/api/members/cart-items", {
         headers: {

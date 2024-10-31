@@ -1,23 +1,25 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { decrypt } from "@/utils/token/token";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import {
   addToCart,
   checkout,
   getCart,
+  getUserByToken,
   removeFromCart,
   updateCartItemQuantity,
 } from "../../../queries/role/members/membersQueries";
 import {
   badRequestResponse,
+  costumHandler,
   errorHandler,
-  forbiddenResponse,
   methodNotAllowedResponse,
   successResponse,
   unauthorizedResponse,
-  unauthorizedTokenResponse,
 } from "@/utils/response/responseHelpers";
-import { isValidApiKey } from "@/utils/validation/validation";
+import {
+  isValidApiKey,
+  validateAuthMembers,
+} from "@/utils/validation/validation";
 
 export const addCartMembers = async (req: NextRequest) => {
   if (!isValidApiKey(req)) {
@@ -28,24 +30,22 @@ export const addCartMembers = async (req: NextRequest) => {
     return methodNotAllowedResponse();
   }
 
-  const authHeader = req.headers.get("Authorization");
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return unauthorizedTokenResponse();
-  }
-  const token = authHeader.split(" ")[1];
-  const decodedToken = await decrypt(token);
-  if (!decodedToken || decodedToken.user.role !== "member") {
-    return forbiddenResponse(decodedToken.user.role);
+  const { isValid, error, token } = await validateAuthMembers(req);
+  if (!isValid || !token) {
+    return error;
   }
 
   try {
-    const { user_id, product_id, quantity } = await req.json();
-    if (!user_id || !product_id || !quantity) {
+    const { product_id, quantity } = await req.json();
+    if (!product_id || !quantity) {
       return badRequestResponse("All fields are required");
     }
-
+    const user = await getUserByToken(token);
+    if (!user) {
+      return null;
+    }
     const datacart = await addToCart({
-      userId: user_id,
+      userId: user.id_user,
       productId: product_id,
       quantity,
     });
@@ -54,17 +54,7 @@ export const addCartMembers = async (req: NextRequest) => {
   } catch (error: any) {
     // Handle specific error cases
     if (error.message.includes("out of stock")) {
-      return NextResponse.json(
-        {
-          code: 400,
-          status: "Failed",
-          error: "Out of Stock",
-          message: error.message,
-        },
-        {
-          status: 400,
-        }
-      );
+      return costumHandler(400, error.message, "Out of Stock");
     }
 
     if (
@@ -72,45 +62,15 @@ export const addCartMembers = async (req: NextRequest) => {
       error.message.includes("Cannot add") ||
       error.message.includes("available")
     ) {
-      return NextResponse.json(
-        {
-          code: 400,
-          status: "Failed",
-          error: "Insufficient Stock",
-          message: error.message,
-        },
-        {
-          status: 400,
-        }
-      );
+      return costumHandler(400, error.message, "Insufficient Stock");
     }
 
     if (error.message === "Quantity must be greater than 0") {
-      return NextResponse.json(
-        {
-          code: 400,
-          status: "Failed",
-          error: "Invalid Quantity",
-          message: error.message,
-        },
-        {
-          status: 400,
-        }
-      );
+      return costumHandler(400, error.message, "Invalid Quantity");
     }
 
     if (error.message === "Product not found") {
-      return NextResponse.json(
-        {
-          code: 404,
-          status: "Failed",
-          error: "Not Found",
-          message: error.message,
-        },
-        {
-          status: 404,
-        }
-      );
+      return costumHandler(404, error.message, "Not Found");
     }
 
     return errorHandler(error, error.message);
@@ -126,31 +86,20 @@ export const getCartByToken = async (req: NextRequest) => {
     return methodNotAllowedResponse();
   }
 
-  const authHeader = req.headers.get("Authorization");
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return unauthorizedTokenResponse();
-  }
-
-  const token = authHeader.split(" ")[1];
-  const decodedToken = await decrypt(token);
-  if (!decodedToken || decodedToken.user.role !== "member") {
-    return forbiddenResponse(decodedToken.user.role);
+  const { isValid, error, token } = await validateAuthMembers(req);
+  if (!isValid || !token) {
+    return error;
   }
 
   try {
-    const id_user = decodedToken.user.id as string;
-    const cartData = await getCart({ userId: id_user });
+    const user = await getUserByToken(token);
+    if (!user) {
+      return null;
+    }
+    const cartData = await getCart({ userId: user.id_user });
 
     if (!cartData) {
-      return NextResponse.json(
-        {
-          code: 404,
-          status: "Failed",
-          error: "Not Found",
-          message: "Cart not found",
-        },
-        { status: 404 }
-      );
+      return costumHandler(404, "Cart not found", "Not Found");
     }
     return successResponse("Success to get member cart", cartData);
   } catch (error: any) {
@@ -167,28 +116,14 @@ export const deleteCart = async (req: NextRequest, id: string) => {
     return methodNotAllowedResponse();
   }
 
-  const authHeader = req.headers.get("Authorization");
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return unauthorizedTokenResponse();
-  }
-
-  const token = authHeader.split(" ")[1];
-  const decodedToken = await decrypt(token);
-  if (!decodedToken || decodedToken.user.role !== "member") {
-    return forbiddenResponse(decodedToken.user.role);
+  const { isValid, error } = await validateAuthMembers(req);
+  if (!isValid) {
+    return error;
   }
 
   try {
     if (!id) {
-      return NextResponse.json(
-        {
-          code: 400,
-          status: "Failed",
-          error: "Bad Request",
-          message: "Cart item ID is required",
-        },
-        { status: 400 }
-      );
+      return badRequestResponse("Cart item ID is required");
     }
 
     const deletedCart = await removeFromCart(id);
@@ -200,15 +135,7 @@ export const deleteCart = async (req: NextRequest, id: string) => {
     // Handle specific error dari queries
     if (error instanceof Error) {
       if (error.message === "Cart item not found") {
-        return NextResponse.json(
-          {
-            code: 404,
-            status: "Failed",
-            error: "Not Found",
-            message: "Cart item not found",
-          },
-          { status: 404 }
-        );
+        return costumHandler(404, "Cart item not found", "Not Found");
       }
     }
 
@@ -226,54 +153,24 @@ export const updateCartItem = async (req: NextRequest, id: string) => {
     return methodNotAllowedResponse();
   }
 
-  const authHeader = req.headers.get("Authorization");
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return unauthorizedTokenResponse();
-  }
-
-  const token = authHeader.split(" ")[1];
-  const decodedToken = await decrypt(token);
-  if (!decodedToken || decodedToken.user.role !== "member") {
-    return forbiddenResponse(decodedToken.user.role);
+  const { isValid, error } = await validateAuthMembers(req);
+  if (!isValid) {
+    return error;
   }
 
   try {
     if (!id) {
-      return NextResponse.json(
-        {
-          code: 400,
-          status: "Failed",
-          error: "Bad Request",
-          message: "Cart item ID is required",
-        },
-        { status: 400 }
-      );
+      return badRequestResponse("Cart item ID is required");
     }
 
     const { quantity } = await req.json();
     if (!quantity) {
-      return NextResponse.json(
-        {
-          code: 400,
-          status: "Failed",
-          error: "Bad Request",
-          message: "Quantity field is required",
-        },
-        { status: 400 }
-      );
+      return badRequestResponse("Quantity field is required");
     }
 
     // Validasi quantity harus lebih dari 0
     if (quantity <= 0) {
-      return NextResponse.json(
-        {
-          code: 400,
-          status: "Failed",
-          error: "Bad Request",
-          message: "Quantity must be greater than 0",
-        },
-        { status: 400 }
-      );
+      return badRequestResponse("Quantity must be greater than 0");
     }
 
     const updatedCart = await updateCartItemQuantity(id, quantity);
@@ -282,39 +179,15 @@ export const updateCartItem = async (req: NextRequest, id: string) => {
     // Handle specific errors from queries
     if (error instanceof Error) {
       if (error.message === "Cart item not found") {
-        return NextResponse.json(
-          {
-            code: 404,
-            status: "Failed",
-            error: "Not Found",
-            message: "Cart item not found",
-          },
-          { status: 404 }
-        );
+        return costumHandler(404, "Cart item not found", "Not Found");
       }
 
       if (error.message.includes("out of stock")) {
-        return NextResponse.json(
-          {
-            code: 400,
-            status: "Failed",
-            error: "Bad Request",
-            message: error.message,
-          },
-          { status: 400 }
-        );
+        return badRequestResponse(error.message);
       }
 
       if (error.message.includes("Cannot add")) {
-        return NextResponse.json(
-          {
-            code: 400,
-            status: "Failed",
-            error: "Bad Request",
-            message: error.message,
-          },
-          { status: 400 }
-        );
+        return badRequestResponse(error.message);
       }
     }
 
@@ -332,32 +205,21 @@ export const checkoutCart = async (req: NextRequest) => {
     return methodNotAllowedResponse();
   }
 
-  const authHeader = req.headers.get("Authorization");
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return unauthorizedTokenResponse();
-  }
-
-  const token = authHeader.split(" ")[1];
-  const decodedToken = await decrypt(token);
-  if (!decodedToken || decodedToken.user.role !== "member") {
-    return forbiddenResponse(decodedToken.user.role);
+  const { isValid, error, token } = await validateAuthMembers(req);
+  if (!isValid || !token) {
+    return error;
   }
 
   try {
-    const { id_user, id_cart } = await req.json();
-    if (!id_user || !id_cart) {
-      return NextResponse.json(
-        {
-          code: 400,
-          status: "Failed",
-          error: "Bad Request",
-          message: "All fields are required",
-        },
-        { status: 400 }
-      );
+    const { id_cart } = await req.json();
+    if (!id_cart) {
+      return badRequestResponse("All fields are required");
     }
-
-    const result = await checkout(id_user, id_cart);
+    const user = await getUserByToken(token);
+    if (!user) {
+      return null;
+    }
+    const result = await checkout(user.id_user, id_cart);
 
     return successResponse("Cart item has been checked out", result);
   } catch (error: any) {
@@ -365,47 +227,17 @@ export const checkoutCart = async (req: NextRequest) => {
     if (error instanceof Error) {
       switch (error.message) {
         case "Cart not found or inactive":
-          return NextResponse.json(
-            {
-              code: 404,
-              status: "Failed",
-              error: "Not Found",
-              message: "Cart not found or inactive",
-            },
-            { status: 404 }
-          );
+          return costumHandler(404, "Cart not found or inactive", "Not Found");
         case "Insufficient balance":
-          return NextResponse.json(
-            {
-              code: 400,
-              status: "Failed",
-              error: "Bad Request",
-              message: "Insufficient balance to complete checkout",
-            },
-            { status: 400 }
+          return badRequestResponse(
+            "Insufficient balance to complete checkout"
           );
         default:
           if (error.message.includes("Produk dengan ID")) {
-            return NextResponse.json(
-              {
-                code: 404,
-                status: "Failed",
-                error: "Not Found",
-                message: error.message,
-              },
-              { status: 404 }
-            );
+            return costumHandler(404, error.message, "Not Found");
           }
           if (error.message.includes("Stok produk")) {
-            return NextResponse.json(
-              {
-                code: 400,
-                status: "Failed",
-                error: "Bad Request",
-                message: error.message,
-              },
-              { status: 400 }
-            );
+            return badRequestResponse(error.message);
           }
       }
     }

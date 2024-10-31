@@ -12,6 +12,15 @@ if (process.env.NODE_ENV === "production") {
 }
 
 export const createOrGetActiveCart = async ({ userId }: { userId: string }) => {
+  // Ensure the user exists before creating a cart
+  const user = await prisma.users.findUnique({
+    where: { id_user: userId },
+  });
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  // Proceed to find or create the cart if user exists
   let cart = await prisma.cart.findFirst({
     where: {
       id_user: userId,
@@ -30,7 +39,6 @@ export const createOrGetActiveCart = async ({ userId }: { userId: string }) => {
 
   return cart;
 };
-
 export const getCart = async ({ userId }: { userId: string }) => {
   const cart = await prisma.cart.findFirst({
     where: {
@@ -281,6 +289,17 @@ export const getCartItems = async (userId: string) => {
   });
 
   return cart;
+};
+
+export const getUserByToken = async (token: string) => {
+  return await prisma.users.findUnique({
+    where: {
+      token: token,
+    },
+    select: {
+      id_user: true,
+    },
+  });
 };
 
 export const checkout = async (id_user: string, id_cart: string) => {

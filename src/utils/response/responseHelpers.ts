@@ -74,3 +74,19 @@ export const errorHandler = (error: Error, errorMessage: string) => {
     { status: 500 }
   );
 };
+
+export const costumHandler = (
+  code: number,
+  message: string,
+  error?: string
+) => {
+  return NextResponse.json(
+    {
+      code: code,
+      status: "Failed",
+      message: message,
+      error: error,
+    },
+    { status: code }
+  );
+};

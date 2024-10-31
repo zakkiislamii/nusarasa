@@ -1,16 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { getAllUsersByRole } from "@/services/api/queries/role/admins/adminsQueries";
 import {
+  costumHandler,
   errorHandler,
-  forbiddenResponse,
   methodNotAllowedResponse,
   successResponse,
   unauthorizedResponse,
-  unauthorizedTokenResponse,
 } from "@/utils/response/responseHelpers";
-import { decrypt } from "@/utils/token/token";
-import { isValidApiKey } from "@/utils/validation/validation";
-import { NextRequest, NextResponse } from "next/server";
+
+import {
+  isValidApiKey,
+  validateAuthAdmins,
+} from "@/utils/validation/validation";
+import { NextRequest } from "next/server";
 
 export const getAllUsersForAdmins = async (req: NextRequest, role: string) => {
   if (!isValidApiKey(req)) {
@@ -21,14 +23,9 @@ export const getAllUsersForAdmins = async (req: NextRequest, role: string) => {
     return methodNotAllowedResponse();
   }
 
-  const authHeader = req.headers.get("Authorization");
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return unauthorizedTokenResponse();
-  }
-  const token = authHeader.split(" ")[1];
-  const decodedToken = await decrypt(token);
-  if (!decodedToken || decodedToken.user.role !== "admin") {
-    return forbiddenResponse(decodedToken.user.role);
+  const { isValid, error } = await validateAuthAdmins(req);
+  if (!isValid) {
+    return error;
   }
 
   try {
@@ -39,13 +36,9 @@ export const getAllUsersForAdmins = async (req: NextRequest, role: string) => {
         data
       );
     } else {
-      return NextResponse.json(
-        {
-          code: 404,
-          status: "Failed",
-          message: `No ${role === "seller" ? "sellers" : "members"} found`,
-        },
-        { status: 404 }
+      return costumHandler(
+        404,
+        `No ${role === "seller" ? "sellers" : "members"} found`
       );
     }
   } catch (error: any) {
