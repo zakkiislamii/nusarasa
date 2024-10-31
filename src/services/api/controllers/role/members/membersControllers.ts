@@ -8,73 +8,40 @@ import {
   removeFromCart,
   updateCartItemQuantity,
 } from "../../../queries/role/members/membersQueries";
+import {
+  badRequestResponse,
+  errorHandler,
+  forbiddenResponse,
+  methodNotAllowedResponse,
+  successResponse,
+  unauthorizedResponse,
+  unauthorizedTokenResponse,
+} from "@/utils/response/responseHelpers";
+import { isValidApiKey } from "@/utils/validation/validation";
 
 export const addCartMembers = async (req: NextRequest) => {
-  const apiKey = req.headers.get("x-api-key");
-  if (apiKey !== process.env.NEXT_PUBLIC_API_KEY) {
-    return NextResponse.json(
-      {
-        code: 401,
-        status: "Failed",
-        error: "Unauthorized",
-        message: "Invalid API key",
-      },
-      { status: 401 }
-    );
+  if (!isValidApiKey(req)) {
+    return unauthorizedResponse();
   }
 
   if (req.method !== "POST") {
-    return NextResponse.json(
-      {
-        code: 405,
-        status: "Failed",
-        message: "Method not allowed",
-        error: "The method is wrong",
-      },
-      { status: 405 }
-    );
+    return methodNotAllowedResponse();
   }
 
   const authHeader = req.headers.get("Authorization");
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return NextResponse.json(
-      {
-        code: 401,
-        status: "Failed",
-        error: "Unauthorized",
-        message: "Missing or invalid Bearer token",
-      },
-      { status: 401 }
-    );
+    return unauthorizedTokenResponse();
   }
   const token = authHeader.split(" ")[1];
   const decodedToken = await decrypt(token);
   if (!decodedToken || decodedToken.user.role !== "member") {
-    return NextResponse.json(
-      {
-        code: 403,
-        status: "Failed",
-        error: "Forbidden",
-        message: "Access denied. Only members can access this resource.",
-      },
-      { status: 403 }
-    );
+    return forbiddenResponse(decodedToken.user.role);
   }
 
   try {
     const { user_id, product_id, quantity } = await req.json();
     if (!user_id || !product_id || !quantity) {
-      return NextResponse.json(
-        {
-          code: 400,
-          status: "Failed",
-          error: "Bad Request",
-          message: "All fields are required",
-        },
-        {
-          status: 400,
-        }
-      );
+      return badRequestResponse("All fields are required");
     }
 
     const datacart = await addToCart({
@@ -83,17 +50,7 @@ export const addCartMembers = async (req: NextRequest) => {
       quantity,
     });
 
-    return NextResponse.json(
-      {
-        code: 200,
-        status: "Success",
-        message: "Product successfully added to cart",
-        data: datacart,
-      },
-      {
-        status: 200,
-      }
-    );
+    return successResponse("Product successfully added to cart", datacart);
   } catch (error: any) {
     // Handle specific error cases
     if (error.message.includes("out of stock")) {
@@ -156,72 +113,28 @@ export const addCartMembers = async (req: NextRequest) => {
       );
     }
 
-    console.error("Error in addCartMembers:", error);
-    return NextResponse.json(
-      {
-        code: 500,
-        status: "Error",
-        message: "Internal server error",
-        error: error.message,
-      },
-      {
-        status: 500,
-      }
-    );
+    return errorHandler(error, error.message);
   }
 };
 
 export const getCartByToken = async (req: NextRequest) => {
-  const apiKey = req.headers.get("x-api-key");
-  if (apiKey !== process.env.NEXT_PUBLIC_API_KEY) {
-    return NextResponse.json(
-      {
-        code: 401,
-        status: "Failed",
-        error: "Unauthorized",
-        message: "Invalid API key",
-      },
-      { status: 401 }
-    );
+  if (!isValidApiKey(req)) {
+    return unauthorizedResponse();
   }
 
   if (req.method !== "GET") {
-    return NextResponse.json(
-      {
-        code: 405,
-        status: "Failed",
-        message: "Method not allowed",
-        error: "The method is wrong",
-      },
-      { status: 405 }
-    );
+    return methodNotAllowedResponse();
   }
 
   const authHeader = req.headers.get("Authorization");
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return NextResponse.json(
-      {
-        code: 401,
-        status: "Failed",
-        error: "Unauthorized",
-        message: "Missing or invalid Bearer token",
-      },
-      { status: 401 }
-    );
+    return unauthorizedTokenResponse();
   }
 
   const token = authHeader.split(" ")[1];
   const decodedToken = await decrypt(token);
   if (!decodedToken || decodedToken.user.role !== "member") {
-    return NextResponse.json(
-      {
-        code: 403,
-        status: "Failed",
-        error: "Forbidden",
-        message: "Access denied. Only members can access this resource.",
-      },
-      { status: 403 }
-    );
+    return forbiddenResponse(decodedToken.user.role);
   }
 
   try {
@@ -239,77 +152,30 @@ export const getCartByToken = async (req: NextRequest) => {
         { status: 404 }
       );
     }
-
-    return NextResponse.json({
-      code: 200,
-      status: "Success",
-      message: "Success to get member cart",
-      data: cartData,
-    });
-  } catch (e) {
-    return NextResponse.json(
-      {
-        code: 500,
-        status: "Error",
-        message: "Internal server error",
-        error: e instanceof Error ? e.message : "Unknown error",
-      },
-      { status: 500 }
-    );
+    return successResponse("Success to get member cart", cartData);
+  } catch (error: any) {
+    return errorHandler(error, error.message);
   }
 };
 
 export const deleteCart = async (req: NextRequest, id: string) => {
-  const apiKey = req.headers.get("x-api-key");
-  if (apiKey !== process.env.NEXT_PUBLIC_API_KEY) {
-    return NextResponse.json(
-      {
-        code: 401,
-        status: "Failed",
-        error: "Unauthorized",
-        message: "Invalid API key",
-      },
-      { status: 401 }
-    );
+  if (!isValidApiKey(req)) {
+    return unauthorizedResponse();
   }
 
   if (req.method !== "DELETE") {
-    return NextResponse.json(
-      {
-        code: 405,
-        status: "Failed",
-        message: "Method not allowed",
-        error: "The method is wrong",
-      },
-      { status: 405 }
-    );
+    return methodNotAllowedResponse();
   }
 
   const authHeader = req.headers.get("Authorization");
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return NextResponse.json(
-      {
-        code: 401,
-        status: "Failed",
-        error: "Unauthorized",
-        message: "Missing or invalid Bearer token",
-      },
-      { status: 401 }
-    );
+    return unauthorizedTokenResponse();
   }
 
   const token = authHeader.split(" ")[1];
   const decodedToken = await decrypt(token);
   if (!decodedToken || decodedToken.user.role !== "member") {
-    return NextResponse.json(
-      {
-        code: 403,
-        status: "Failed",
-        error: "Forbidden",
-        message: "Access denied. Only members can access this resource.",
-      },
-      { status: 403 }
-    );
+    return forbiddenResponse(decodedToken.user.role);
   }
 
   try {
@@ -326,16 +192,11 @@ export const deleteCart = async (req: NextRequest, id: string) => {
     }
 
     const deletedCart = await removeFromCart(id);
-    return NextResponse.json(
-      {
-        code: 200,
-        status: "Success",
-        message: "Cart item has been deleted successfully",
-        data: deletedCart,
-      },
-      { status: 200 }
+    return successResponse(
+      "Cart item has been deleted successfully",
+      deletedCart
     );
-  } catch (error) {
+  } catch (error: any) {
     // Handle specific error dari queries
     if (error instanceof Error) {
       if (error.message === "Cart item not found") {
@@ -352,69 +213,28 @@ export const deleteCart = async (req: NextRequest, id: string) => {
     }
 
     // Default error handler
-    return NextResponse.json(
-      {
-        code: 500,
-        status: "Error",
-        message: "Internal server error",
-        error: error instanceof Error ? error.message : "Unknown error",
-      },
-      { status: 500 }
-    );
+    return errorHandler(error, error.message);
   }
 };
 
 export const updateCartItem = async (req: NextRequest, id: string) => {
-  const apiKey = req.headers.get("x-api-key");
-  if (apiKey !== process.env.NEXT_PUBLIC_API_KEY) {
-    return NextResponse.json(
-      {
-        code: 401,
-        status: "Failed",
-        error: "Unauthorized",
-        message: "Invalid API key",
-      },
-      { status: 401 }
-    );
+  if (!isValidApiKey(req)) {
+    return unauthorizedResponse();
   }
 
   if (req.method !== "PUT") {
-    return NextResponse.json(
-      {
-        code: 405,
-        status: "Failed",
-        message: "Method not allowed",
-        error: "The method is wrong",
-      },
-      { status: 405 }
-    );
+    return methodNotAllowedResponse();
   }
 
   const authHeader = req.headers.get("Authorization");
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return NextResponse.json(
-      {
-        code: 401,
-        status: "Failed",
-        error: "Unauthorized",
-        message: "Missing or invalid Bearer token",
-      },
-      { status: 401 }
-    );
+    return unauthorizedTokenResponse();
   }
 
   const token = authHeader.split(" ")[1];
   const decodedToken = await decrypt(token);
   if (!decodedToken || decodedToken.user.role !== "member") {
-    return NextResponse.json(
-      {
-        code: 403,
-        status: "Failed",
-        error: "Forbidden",
-        message: "Access denied. Only members can access this resource.",
-      },
-      { status: 403 }
-    );
+    return forbiddenResponse(decodedToken.user.role);
   }
 
   try {
@@ -457,16 +277,8 @@ export const updateCartItem = async (req: NextRequest, id: string) => {
     }
 
     const updatedCart = await updateCartItemQuantity(id, quantity);
-    return NextResponse.json(
-      {
-        code: 200,
-        status: "Success",
-        message: "Cart has been updated",
-        data: updatedCart,
-      },
-      { status: 200 }
-    );
-  } catch (error) {
+    return successResponse("Cart has been updated", updatedCart);
+  } catch (error: any) {
     // Handle specific errors from queries
     if (error instanceof Error) {
       if (error.message === "Cart item not found") {
@@ -507,69 +319,28 @@ export const updateCartItem = async (req: NextRequest, id: string) => {
     }
 
     // Default error handler
-    return NextResponse.json(
-      {
-        code: 500,
-        status: "Error",
-        message: "Internal server error",
-        error: error instanceof Error ? error.message : "Unknown error",
-      },
-      { status: 500 }
-    );
+    return errorHandler(error, error.message);
   }
 };
 
 export const checkoutCart = async (req: NextRequest) => {
-  const apiKey = req.headers.get("x-api-key");
-  if (apiKey !== process.env.NEXT_PUBLIC_API_KEY) {
-    return NextResponse.json(
-      {
-        code: 401,
-        status: "Failed",
-        error: "Unauthorized",
-        message: "Invalid API key",
-      },
-      { status: 401 }
-    );
+  if (!isValidApiKey(req)) {
+    return unauthorizedResponse();
   }
 
   if (req.method !== "POST") {
-    return NextResponse.json(
-      {
-        code: 405,
-        status: "Failed",
-        message: "Method not allowed",
-        error: "The method is wrong",
-      },
-      { status: 405 }
-    );
+    return methodNotAllowedResponse();
   }
 
   const authHeader = req.headers.get("Authorization");
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return NextResponse.json(
-      {
-        code: 401,
-        status: "Failed",
-        error: "Unauthorized",
-        message: "Missing or invalid Bearer token",
-      },
-      { status: 401 }
-    );
+    return unauthorizedTokenResponse();
   }
 
   const token = authHeader.split(" ")[1];
   const decodedToken = await decrypt(token);
   if (!decodedToken || decodedToken.user.role !== "member") {
-    return NextResponse.json(
-      {
-        code: 403,
-        status: "Failed",
-        error: "Forbidden",
-        message: "Access denied. Only members can access this resource.",
-      },
-      { status: 403 }
-    );
+    return forbiddenResponse(decodedToken.user.role);
   }
 
   try {
@@ -588,16 +359,8 @@ export const checkoutCart = async (req: NextRequest) => {
 
     const result = await checkout(id_user, id_cart);
 
-    return NextResponse.json(
-      {
-        code: 200,
-        status: "Success",
-        message: "Cart item has been checked out",
-        data: result,
-      },
-      { status: 200 }
-    );
-  } catch (error) {
+    return successResponse("Cart item has been checked out", result);
+  } catch (error: any) {
     // Handle specific errors dari query
     if (error instanceof Error) {
       switch (error.message) {
@@ -648,14 +411,6 @@ export const checkoutCart = async (req: NextRequest) => {
     }
 
     // Default error response
-    return NextResponse.json(
-      {
-        code: 500,
-        status: "Error",
-        message: "Internal server error",
-        error: error instanceof Error ? error.message : "Unknown error",
-      },
-      { status: 500 }
-    );
+    return errorHandler(error, error.message);
   }
 };

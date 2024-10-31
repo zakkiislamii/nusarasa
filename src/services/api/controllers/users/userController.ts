@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   findManyUsers,
   registerUser,
@@ -14,78 +15,36 @@ import {
 import { NextResponse, NextRequest } from "next/server";
 import bcrypt from "bcrypt/";
 import { encrypt, getSession, getSessionForCheck } from "@/utils/token/token";
+import {
+  badRequestResponse,
+  errorHandler,
+  methodNotAllowedResponse,
+  successResponse,
+  unauthorizedResponse,
+  unauthorizedTokenResponse,
+} from "@/utils/response/responseHelpers";
+import { isValidApiKey } from "@/utils/validation/validation";
 
 export const getAllUsers = async (req: NextRequest) => {
   const apiKey = req.headers.get("x-api-key");
   if (apiKey === process.env.NEXT_PUBLIC_API_KEY) {
     try {
       const data = await findManyUsers();
-      return NextResponse.json(
-        {
-          code: 200,
-          status: "Success",
-          message: "Users retrieved successfully",
-          data,
-        },
-        {
-          status: 200,
-        }
-      );
-    } catch (error: unknown) {
-      return NextResponse.json(
-        {
-          code: 500,
-          status: "Error",
-          message: "Internal server error",
-          error,
-        },
-        {
-          status: 500,
-        }
-      );
+      return successResponse("Users retrieved successfully", data);
+    } catch (error: any) {
+      return errorHandler(error, error.message);
     }
   } else {
-    return NextResponse.json(
-      {
-        code: 401,
-        status: "Failed",
-        error: "Unauthorized",
-        message: "Invalid API key",
-      },
-      {
-        status: 401,
-      }
-    );
+    return unauthorizedResponse();
   }
 };
 
 export const register = async (req: NextRequest) => {
-  const apiKey = req.headers.get("x-api-key");
-  if (apiKey !== process.env.NEXT_PUBLIC_API_KEY) {
-    return NextResponse.json(
-      {
-        code: 401,
-        status: "Failed",
-        error: "Unauthorized",
-        message: "Invalid API key",
-      },
-      {
-        status: 401,
-      }
-    );
+  if (!isValidApiKey(req)) {
+    return unauthorizedResponse();
   }
   if (req.method !== "POST") {
-    return NextResponse.json(
-      {
-        code: 405,
-        status: "failed",
-        message: "the method is wrong",
-        error: "Method not allowed",
-      },
-      {
-        status: 405,
-      }
-    );
+    return methodNotAllowedResponse();
   }
 
   try {
@@ -93,17 +52,7 @@ export const register = async (req: NextRequest) => {
 
     // Validasi input
     if (!email || !password || !confirm_password || !username) {
-      return NextResponse.json(
-        {
-          code: 400,
-          status: "Failed",
-          error: "Bad Request",
-          message: "All fields are required",
-        },
-        {
-          status: 400,
-        }
-      );
+      return badRequestResponse("All fields are required");
     }
     const checked = await existingUser({ email, username });
     if (checked) {
@@ -135,17 +84,7 @@ export const register = async (req: NextRequest) => {
     }
 
     if (password !== confirm_password) {
-      return NextResponse.json(
-        {
-          code: 400,
-          status: "Failed",
-          error: "Bad Request",
-          message: "Passwords do not match",
-        },
-        {
-          status: 400,
-        }
-      );
+      return badRequestResponse("Passwords do not match");
     }
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -156,63 +95,20 @@ export const register = async (req: NextRequest) => {
       username,
     });
 
-    return NextResponse.json(
-      {
-        code: 200,
-        status: "Success",
-        message: "User registered successfully",
-      },
-      {
-        status: 200,
-      }
-    );
-  } catch (error) {
-    console.log(error);
-    const errorMessage =
-      error instanceof Error ? error.message : "An unknown error occurred";
-    return NextResponse.json(
-      {
-        code: 500,
-        status: "Error",
-        message: "Internal server error",
-        error: errorMessage,
-      },
-      {
-        status: 500,
-      }
-    );
+    return successResponse("User registered successfully");
+  } catch (error: any) {
+    return errorHandler(error, error.message);
   }
 };
 
 export const deleteUser = async (req: NextRequest, id: string) => {
-  const apiKey = req.headers.get("x-api-key");
-  if (apiKey !== process.env.NEXT_PUBLIC_API_KEY) {
-    return NextResponse.json(
-      {
-        code: 401,
-        status: "Failed",
-        error: "Unauthorized",
-        message: "Invalid API key",
-      },
-      {
-        status: 401,
-      }
-    );
+  if (!isValidApiKey(req)) {
+    return unauthorizedResponse();
   }
 
   try {
     if (!id) {
-      return NextResponse.json(
-        {
-          code: 400,
-          status: "Failed",
-          error: "Bad Request",
-          message: "User ID is required",
-        },
-        {
-          status: 400,
-        }
-      );
+      return badRequestResponse("User ID is required");
     }
     const checked = await existingDeleteUser({ id });
     if (!checked) {
@@ -242,59 +138,21 @@ export const deleteUser = async (req: NextRequest, id: string) => {
           }
         );
       } else {
-        return NextResponse.json(
-          {
-            code: 200,
-            status: "Success",
-            message: "User has been deleted",
-          },
-          {
-            status: 200,
-          }
-        );
+        return successResponse("User has been deleted");
       }
     }
-  } catch (error: unknown) {
-    const errorMessage =
-      error instanceof Error ? error.message : "An unknown error occurred";
-    return NextResponse.json(
-      {
-        code: 500,
-        status: "Error",
-        message: "Internal server error",
-        error: errorMessage,
-      },
-      {
-        status: 500,
-      }
-    );
+  } catch (error: any) {
+    return errorHandler(error, error.message);
   }
 };
 
 export const login = async (req: NextRequest) => {
-  const apiKey = req.headers.get("x-api-key");
-  if (apiKey !== process.env.NEXT_PUBLIC_API_KEY) {
-    return NextResponse.json(
-      {
-        code: 401,
-        status: "Failed",
-        error: "Unauthorized",
-        message: "Invalid API key",
-      },
-      { status: 401 }
-    );
+  if (!isValidApiKey(req)) {
+    return unauthorizedResponse();
   }
 
   if (req.method !== "POST") {
-    return NextResponse.json(
-      {
-        code: 405,
-        status: "failed",
-        message: "The method is wrong",
-        error: "Method not allowed",
-      },
-      { status: 405 }
-    );
+    return methodNotAllowedResponse();
   }
 
   try {
@@ -356,20 +214,11 @@ export const login = async (req: NextRequest) => {
     });
 
     await saveToken({ token: session, username });
-
-    const response = NextResponse.json(
-      {
-        code: 200,
-        status: "Success",
-        message: "Login successful",
-        data: {
-          email: user.email,
-          username: user.username,
-          session,
-        },
-      },
-      { status: 200 }
-    );
+    const response = successResponse("Login successful", {
+      email: user.email,
+      username: user.username,
+      session,
+    });
 
     // Set the session cookie
     response.cookies.set({
@@ -382,59 +231,26 @@ export const login = async (req: NextRequest) => {
     });
 
     return response;
-  } catch (error) {
-    return NextResponse.json(
-      {
-        code: 500,
-        status: "Error",
-        message: "Internal server error",
-        error: error instanceof Error ? error.message : String(error),
-      },
-      { status: 500 }
-    );
+  } catch (error: any) {
+    return errorHandler(error, error.message);
   }
 };
 
 export const updatePersonalData = async (req: NextRequest) => {
   // Check API key
-  const apiKey = req.headers.get("x-api-key");
-  if (apiKey !== process.env.NEXT_PUBLIC_API_KEY) {
-    return NextResponse.json(
-      {
-        code: 401,
-        status: "Failed",
-        error: "Unauthorized",
-        message: "Invalid API key",
-      },
-      { status: 401 }
-    );
+  if (!isValidApiKey(req)) {
+    return unauthorizedResponse();
   }
 
   // Check HTTP method
   if (req.method !== "PUT") {
-    return NextResponse.json(
-      {
-        code: 405,
-        status: "Failed",
-        message: "The method is wrong",
-        error: "Method not allowed",
-      },
-      { status: 405 }
-    );
+    return methodNotAllowedResponse();
   }
 
   try {
     const authHeader = req.headers.get("Authorization");
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return NextResponse.json(
-        {
-          code: 401,
-          status: "Failed",
-          error: "Unauthorized",
-          message: "Missing or invalid Bearer token",
-        },
-        { status: 401 }
-      );
+      return unauthorizedTokenResponse();
     }
 
     const token = authHeader.split(" ")[1];
@@ -450,69 +266,28 @@ export const updatePersonalData = async (req: NextRequest) => {
       token,
     });
 
-    return NextResponse.json(
-      {
-        code: 200,
-        status: "Success",
-        message: "Personal data updated successfully",
-      },
-      { status: 200 }
-    );
-  } catch (error) {
-    console.error("Error updating personal data:", error);
-    return NextResponse.json(
-      {
-        code: 500,
-        status: "Failed",
-        error: error,
-        message: "An error occurred while updating personal data",
-      },
-      { status: 500 }
-    );
+    return successResponse("Personal data updated successfully");
+  } catch (error: any) {
+    return errorHandler(error, error.message);
   }
 };
 
 export const getProfile = async (req: NextRequest) => {
   // Check API key
-  const apiKey = req.headers.get("x-api-key");
-  if (apiKey !== process.env.NEXT_PUBLIC_API_KEY) {
-    return NextResponse.json(
-      {
-        code: 401,
-        status: "Failed",
-        error: "Unauthorized",
-        message: "Invalid API key",
-      },
-      { status: 401 }
-    );
+  if (!isValidApiKey(req)) {
+    return unauthorizedResponse();
   }
 
   // Check HTTP method
   if (req.method !== "GET") {
-    return NextResponse.json(
-      {
-        code: 405,
-        status: "Failed",
-        message: "The method is wrong",
-        error: "Method not allowed",
-      },
-      { status: 405 }
-    );
+    return methodNotAllowedResponse();
   }
 
   try {
     // Get Bearer token from header
     const authHeader = req.headers.get("Authorization");
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return NextResponse.json(
-        {
-          code: 401,
-          status: "Failed",
-          error: "Unauthorized",
-          message: "Missing or invalid Bearer token",
-        },
-        { status: 401 }
-      );
+      return unauthorizedTokenResponse();
     }
 
     const token = authHeader.split(" ")[1];
@@ -520,70 +295,28 @@ export const getProfile = async (req: NextRequest) => {
     // Update user data using the query function
     const data = await getProfileById({ token });
 
-    return NextResponse.json(
-      {
-        code: 200,
-        status: "Success",
-        message: "Successfully get user profile!",
-        data,
-      },
-      { status: 200 }
-    );
-  } catch (error) {
-    console.error("Error updating personal data:", error);
-    return NextResponse.json(
-      {
-        code: 500,
-        status: "Failed",
-        error: "Internal Server Error",
-        message: "An error occurred while get user profile",
-      },
-      { status: 500 }
-    );
+    return successResponse("Successfully get user profile!", data);
+  } catch (error: any) {
+    return errorHandler(error, error.message);
   }
 };
 
 export const editProfile = async (req: NextRequest) => {
   // Check API key
-  const apiKey = req.headers.get("x-api-key");
-  if (apiKey !== process.env.NEXT_PUBLIC_API_KEY) {
-    return NextResponse.json(
-      {
-        code: 401,
-        status: "Failed",
-        error: "Unauthorized",
-        message: "Invalid API key",
-      },
-      { status: 401 }
-    );
+  if (!isValidApiKey(req)) {
+    return unauthorizedResponse();
   }
 
   // Check HTTP method
   if (req.method !== "POST") {
-    return NextResponse.json(
-      {
-        code: 405,
-        status: "Failed",
-        message: "The method is wrong",
-        error: "Method not allowed",
-      },
-      { status: 405 }
-    );
+    return methodNotAllowedResponse();
   }
 
   try {
     // Get Bearer token from header
     const authHeader = req.headers.get("Authorization");
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return NextResponse.json(
-        {
-          code: 401,
-          status: "Failed",
-          error: "Unauthorized",
-          message: "Missing or invalid Bearer token",
-        },
-        { status: 401 }
-      );
+      return unauthorizedTokenResponse();
     }
 
     const token = authHeader.split(" ")[1];
@@ -618,74 +351,26 @@ export const editProfile = async (req: NextRequest) => {
       username,
       token,
     });
-
-    return NextResponse.json(
-      {
-        code: 200,
-        status: "Success",
-        message: "Personal data updated successfully",
-      },
-      { status: 200 }
-    );
-  } catch (error) {
-    console.error("Error updating personal data:", error);
-    return NextResponse.json(
-      {
-        code: 500,
-        status: "Failed",
-        error: "Internal Server Error",
-        message: "An error occurred while updating personal data",
-      },
-      { status: 500 }
-    );
+    return successResponse("Personal data updated successfully");
+  } catch (error: any) {
+    return errorHandler(error, error.message);
   }
 };
 export const logout = async (req: NextRequest) => {
-  const apiKey = req.headers.get("x-api-key");
-  if (apiKey !== process.env.NEXT_PUBLIC_API_KEY) {
-    return NextResponse.json(
-      {
-        code: 401,
-        status: "Failed",
-        error: "Unauthorized",
-        message: "Invalid API key",
-      },
-      { status: 401 }
-    );
+  if (!isValidApiKey(req)) {
+    return unauthorizedResponse();
   }
 
   if (req.method !== "POST") {
-    return NextResponse.json(
-      {
-        code: 405,
-        status: "failed",
-        message: "Method not allowed",
-        error: "The method is wrong",
-      },
-      { status: 405 }
-    );
+    return methodNotAllowedResponse();
   }
   // Get Bearer token from header
   const authHeader = req.headers.get("Authorization");
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return NextResponse.json(
-      {
-        code: 401,
-        status: "Failed",
-        error: "Unauthorized",
-        message: "Missing or invalid Bearer token",
-      },
-      { status: 401 }
-    );
+    return unauthorizedTokenResponse();
   }
-  const response = NextResponse.json(
-    {
-      code: 200,
-      status: "Success",
-      message: "Logged out successfully",
-    },
-    { status: 200 }
-  );
+
+  const response = successResponse("Logged out successfully");
 
   response.cookies.set({
     name: "session",
@@ -700,40 +385,15 @@ export const logout = async (req: NextRequest) => {
 };
 
 export const checkAuth = async (req: NextRequest) => {
-  const apiKey = req.headers.get("x-api-key");
-  if (apiKey !== process.env.NEXT_PUBLIC_API_KEY) {
-    return NextResponse.json(
-      {
-        code: 401,
-        status: "Failed",
-        error: "Unauthorized",
-        message: "Invalid API key",
-      },
-      { status: 401 }
-    );
+  if (!isValidApiKey(req)) {
+    return unauthorizedResponse();
   }
   if (req.method !== "GET") {
-    return NextResponse.json(
-      {
-        code: 405,
-        status: "failed",
-        message: "Method not allowed",
-        error: "The method is wrong",
-      },
-      { status: 405 }
-    );
+    return methodNotAllowedResponse();
   }
   const authHeader = req.headers.get("Authorization");
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return NextResponse.json(
-      {
-        code: 401,
-        status: "Failed",
-        error: "Unauthorized",
-        message: "Missing or invalid Bearer token",
-      },
-      { status: 401 }
-    );
+    return unauthorizedTokenResponse();
   }
 
   const session = await getSessionForCheck();
@@ -749,18 +409,9 @@ export const checkAuth = async (req: NextRequest) => {
       { status: 401 }
     );
   }
-
-  return NextResponse.json(
-    {
-      code: 200,
-      status: "Success",
-      message: "Authenticated",
-      data: {
-        isLoggedIn: true,
-        session,
-        token,
-      },
-    },
-    { status: 200 }
-  );
+  return successResponse("Authenticated", {
+    isLoggedIn: true,
+    session,
+    token,
+  });
 };
