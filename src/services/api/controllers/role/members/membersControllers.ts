@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import {
   addToCart,
   checkout,
@@ -42,7 +42,7 @@ export const addCartMembers = async (req: NextRequest) => {
     }
     const user = await getUserByToken(token);
     if (!user) {
-      return null;
+      return costumHandler(400, "User not found");
     }
     const datacart = await addToCart({
       userId: user.id_user,
@@ -94,7 +94,7 @@ export const getCartByToken = async (req: NextRequest) => {
   try {
     const user = await getUserByToken(token);
     if (!user) {
-      return null;
+      return costumHandler(400, "User not found");
     }
     const cartData = await getCart({ userId: user.id_user });
 
@@ -144,7 +144,10 @@ export const deleteCart = async (req: NextRequest, id: string) => {
   }
 };
 
-export const updateCartItem = async (req: NextRequest, id: string) => {
+export const updateCartItem = async (
+  req: NextRequest,
+  id: string
+): Promise<NextResponse> => {
   if (!isValidApiKey(req)) {
     return unauthorizedResponse();
   }
@@ -168,7 +171,6 @@ export const updateCartItem = async (req: NextRequest, id: string) => {
       return badRequestResponse("Quantity field is required");
     }
 
-    // Validasi quantity harus lebih dari 0
     if (quantity <= 0) {
       return badRequestResponse("Quantity must be greater than 0");
     }
@@ -176,18 +178,9 @@ export const updateCartItem = async (req: NextRequest, id: string) => {
     const updatedCart = await updateCartItemQuantity(id, quantity);
     return successResponse("Cart has been updated", updatedCart);
   } catch (error: any) {
-    // Handle specific errors from queries
     if (error instanceof Error) {
       if (error.message === "Cart item not found") {
         return costumHandler(404, "Cart item not found", "Not Found");
-      }
-
-      if (error.message.includes("out of stock")) {
-        return badRequestResponse(error.message);
-      }
-
-      if (error.message.includes("Cannot add")) {
-        return badRequestResponse(error.message);
       }
     }
 
@@ -217,7 +210,7 @@ export const checkoutCart = async (req: NextRequest) => {
     }
     const user = await getUserByToken(token);
     if (!user) {
-      return null;
+      return costumHandler(400, "User not found");
     }
     const result = await checkout(user.id_user, id_cart);
 

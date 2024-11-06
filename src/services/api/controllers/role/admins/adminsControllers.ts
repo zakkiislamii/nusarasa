@@ -1,22 +1,23 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { getAllUsersByRole } from "@/services/api/queries/role/admins/adminsQueries";
 import {
   costumHandler,
   errorHandler,
   methodNotAllowedResponse,
   successResponse,
-  unauthorizedResponse,
+  unauthorizedTokenResponse,
 } from "@/utils/response/responseHelpers";
-
 import {
   isValidApiKey,
   validateAuthAdmins,
 } from "@/utils/validation/validation";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export const getAllUsersForAdmins = async (req: NextRequest, role: string) => {
+export const getAllUsersForAdmins = async (
+  req: NextRequest,
+  role: string
+): Promise<Response> => {
   if (!isValidApiKey(req)) {
-    return unauthorizedResponse();
+    return unauthorizedTokenResponse();
   }
 
   if (req.method !== "GET") {
@@ -25,7 +26,9 @@ export const getAllUsersForAdmins = async (req: NextRequest, role: string) => {
 
   const { isValid, error } = await validateAuthAdmins(req);
   if (!isValid) {
-    return error;
+    return error instanceof Response
+      ? error
+      : new NextResponse(null, { status: 500 });
   }
 
   try {
@@ -41,7 +44,18 @@ export const getAllUsersForAdmins = async (req: NextRequest, role: string) => {
         `No ${role === "seller" ? "sellers" : "members"} found`
       );
     }
-  } catch (error: any) {
-    return errorHandler(error, error.message);
+  } catch (error: unknown) {
+    let errorMessage: string;
+    let errorObject: Error;
+
+    if (error instanceof Error) {
+      errorMessage = error.message;
+      errorObject = error;
+    } else {
+      errorMessage = "An unknown error occurred";
+      errorObject = new Error(errorMessage);
+    }
+
+    return errorHandler(errorObject, errorMessage);
   }
 };
