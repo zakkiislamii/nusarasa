@@ -15,7 +15,7 @@ export const DELETE = async (
 export const PUT = async (
   req: NextRequest,
   { params }: { params: { id: string } }
-): Promise<Response> => {
+) => {
   const { id } = params;
   return await updateCartItem(req, id);
 };

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import {
   addToCart,
   checkout,
@@ -144,10 +144,7 @@ export const deleteCart = async (req: NextRequest, id: string) => {
   }
 };
 
-export const updateCartItem = async (
-  req: NextRequest,
-  id: string
-): Promise<NextResponse> => {
+export const updateCartItem = async (req: NextRequest, id: string) => {
   if (!isValidApiKey(req)) {
     return unauthorizedResponse();
   }

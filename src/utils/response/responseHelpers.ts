@@ -2,15 +2,12 @@
 import { ApiResponse } from "@/interfaces/api";
 import { NextResponse } from "next/server";
 
-export const successResponse = (
-  message: string,
-  data?: any
-): NextResponse<ApiResponse> => {
+export const successResponse = (message: string, data?: any) => {
   return NextResponse.json(
     {
       code: 200,
       status: "success",
-      message,
+      message: message,
       data,
     },
     { status: 200 }
@@ -64,7 +61,7 @@ export const badRequestResponse = (
     {
       code: 400,
       status: "error",
-      message,
+      message: message,
     },
     { status: 400 }
   );
