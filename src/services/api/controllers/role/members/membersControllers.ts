@@ -3,6 +3,7 @@ import { NextRequest } from "next/server";
 import {
   addToCart,
   checkout,
+  checkoutHistory,
   getCart,
   getUserByToken,
   removeFromCart,
@@ -232,7 +233,31 @@ export const checkoutCart = async (req: NextRequest) => {
       }
     }
 
-    // Default error response
+    return errorHandler(error, error.message);
+  }
+};
+
+export const historyCart = async (req: NextRequest) => {
+  if (!isValidApiKey(req)) {
+    return unauthorizedResponse();
+  }
+
+  if (req.method !== "GET") {
+    return methodNotAllowedResponse();
+  }
+
+  const { isValid, error, token } = await validateAuthMembers(req);
+  if (!isValid || !token) {
+    return error;
+  }
+  try {
+    const user = await getUserByToken(token);
+    if (!user) {
+      return costumHandler(400, "User not found");
+    }
+    const data = await checkoutHistory(user.id_user);
+    return successResponse("Success get history members", data);
+  } catch (error: any) {
     return errorHandler(error, error.message);
   }
 };

@@ -47,8 +47,7 @@ export const unauthorizedResponse = (): NextResponse<ApiResponse> => {
     {
       code: 401,
       status: "error",
-      message: "Invalid API key",
-      error: "Unauthorized",
+      message: "Invalid API Key",
     },
     { status: 401 }
   );
@@ -72,7 +71,7 @@ export const unauthorizedTokenResponse = (): NextResponse<ApiResponse> => {
     {
       code: 401,
       status: "error",
-      message: "Unauthorized",
+      message: "Invalid Bearer Token",
     },
     { status: 401 }
   );

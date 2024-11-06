@@ -388,11 +388,11 @@ export const checkout = async (id_user: string, id_cart: string) => {
       });
 
       // 7. Hapus cart items
-      await tx.cartItem.deleteMany({
-        where: {
-          id_cart: id_cart,
-        },
-      });
+      // await tx.cartItem.deleteMany({
+      //   where: {
+      //     id_cart: id_cart,
+      //   },
+      // });
 
       // 8. Ambil data cart terbaru setelah items dihapus
       const finalCart = await tx.cart.findUnique({
@@ -419,4 +419,25 @@ export const checkout = async (id_user: string, id_cart: string) => {
   } catch (error) {
     throw error;
   }
+};
+
+export const checkoutHistory = async (id_user: string) => {
+  const data = await prisma.cart.findMany({
+    where: {
+      id_user: id_user,
+      status: "checkout",
+    },
+    include: {
+      items: {
+        include: {
+          product: true,
+          store: true,
+        },
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+  return data;
 };

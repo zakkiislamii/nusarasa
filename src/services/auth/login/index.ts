@@ -3,13 +3,22 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { getSession } from "@/utils/token/token";
+import { LoginFormData } from "@/interfaces/login";
 
-export interface LoginFormData {
-  username: string;
-  password: string;
-}
+const useTogglePassword = () => {
+  const [showPassword, setShowPassword] = useState(false);
 
-export const useLoginForm = (
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
+  };
+
+  return {
+    showPassword,
+    togglePasswordVisibility,
+  };
+};
+
+const useLoginForm = (
   initialProfileData: LoginFormData = { username: "", password: "" }
 ) => {
   const [formData, setFormData] = useState<LoginFormData>({
@@ -28,7 +37,7 @@ export const useLoginForm = (
   return { formData, handleChange };
 };
 
-export const useLogin = () => {
+const useLogin = () => {
   const [loading, setLoading] = useState(false);
 
   const onSubmit = async (
@@ -65,7 +74,7 @@ export const useLogin = () => {
   return { onSubmit, loading };
 };
 
-export const useLogout = () => {
+const useLogout = () => {
   const router = useRouter();
 
   const logout = useCallback(async () => {
@@ -95,7 +104,7 @@ export const useLogout = () => {
   return logout;
 };
 
-export const useScrollHandler = () => {
+const useScrollHandler = () => {
   const [isScrolling, setIsScrolling] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -118,4 +127,12 @@ export const useScrollHandler = () => {
   }, []);
 
   return { isScrolling, isScrolled };
+};
+
+export {
+  useLogin,
+  useLoginForm,
+  useTogglePassword,
+  useLogout,
+  useScrollHandler,
 };

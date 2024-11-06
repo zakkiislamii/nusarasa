@@ -1,25 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import {
   forbiddenResponse,
   unauthorizedTokenResponse,
 } from "../response/responseHelpers";
 import { decrypt } from "../token/token";
 
-interface ValidationResult {
-  isValid: boolean;
-  error: NextResponse; // Ensure you return a consistent type
-  decodedToken: any; // Specify a more detailed type if possible
-  token: string | null;
-}
-
 export const isValidApiKey = (req: NextRequest): boolean => {
   return req.headers.get("x-api-key") === process.env.NEXT_PUBLIC_API_KEY;
 };
 
-export const validateAuthMembers = async (
-  req: NextRequest
-): Promise<ValidationResult> => {
+export const validateAuthMembers = async (req: NextRequest) => {
   try {
     const authHeader = req.headers.get("Authorization");
 
@@ -46,7 +37,7 @@ export const validateAuthMembers = async (
 
     return {
       isValid: true,
-         error: unauthorizedTokenResponse(),
+      error: unauthorizedTokenResponse(),
       decodedToken,
       token,
     };
@@ -60,9 +51,7 @@ export const validateAuthMembers = async (
   }
 };
 
-export const validateAuthAdmins = async (
-  req: NextRequest
-): Promise<ValidationResult> => {
+export const validateAuthAdmins = async (req: NextRequest) => {
   try {
     const authHeader = req.headers.get("Authorization");
 
@@ -89,7 +78,7 @@ export const validateAuthAdmins = async (
 
     return {
       isValid: true,
-         error: unauthorizedTokenResponse(),
+      error: unauthorizedTokenResponse(),
       decodedToken,
       token,
     };
@@ -103,9 +92,7 @@ export const validateAuthAdmins = async (
   }
 };
 
-export const validateAuthSellers = async (
-  req: NextRequest
-): Promise<ValidationResult> => {
+export const validateAuthSellers = async (req: NextRequest) => {
   try {
     const authHeader = req.headers.get("Authorization");
 
@@ -132,7 +119,7 @@ export const validateAuthSellers = async (
 
     return {
       isValid: true,
-         error: unauthorizedTokenResponse(),
+      error: unauthorizedTokenResponse(),
       decodedToken,
       token,
     };

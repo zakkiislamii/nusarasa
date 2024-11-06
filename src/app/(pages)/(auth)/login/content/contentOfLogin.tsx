@@ -1,26 +1,25 @@
 "use client";
 import Image from "next/image";
-import { useLoginForm, useLogin } from "../../../../../services/auth/login";
 import Link from "next/link";
-import { useTogglePassword } from "../../../../../components/pages/login";
-import { icons } from "../../../../../components/pages/login";
+import { icons } from "@/components/pages/login";
 import ButtonGoogle from "@/components/buttoms/buttom submit google";
 import Button from "@/components/buttoms/buttom submit";
 import LoadingState from "@/components/loading";
+import {
+  useLogin,
+  useLoginForm,
+  useTogglePassword,
+} from "@/services/auth/login";
 
-export default function ContentOfLogin(): JSX.Element {
+export default function ContentOfLogin() {
+  console.log("useLogin imported==> ", useLogin);
   const { onSubmit, loading } = useLogin();
   const { formData, handleChange } = useLoginForm();
   const { showPassword, togglePasswordVisibility } = useTogglePassword();
   const { iconUsername, iconHide, iconShow, iconPassword } = icons();
 
-  
   if (loading) {
-    return (
-      <>
-        <LoadingState />
-      </>
-    );
+    return <LoadingState />;
   }
 
   return (

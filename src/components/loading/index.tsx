@@ -1,3 +1,4 @@
+"use client";
 import { ScaleLoader } from "react-spinners";
 import { useState, useEffect } from "react";
 
