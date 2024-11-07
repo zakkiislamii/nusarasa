@@ -1,4 +1,3 @@
-// app/(pages)/dashboard/(pages)/(role)/(admin)/all-member/contents/body/page.tsx
 "use client";
 import LoadingState from "@/components/loading";
 import { Search } from "lucide-react";
@@ -6,7 +5,7 @@ import {
   useFilteredAndSortedMembers,
   useMemberExpand,
 } from "@/services/client/dashboard/role/admin/all-member";
-import { Header } from "../../../../../../../../../components/pages/dashboard/role/admin/header/page";
+import { Header } from "../../../../../../../../components/pages/dashboard/role/admin/header/page";
 import { MemberCard } from "@/components/card/cardListMembers/page";
 
 export default function Body() {

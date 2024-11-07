@@ -1,9 +1,5 @@
 import StatusBadge from "@/components/pages/dashboard/role/admin/status/page";
-import { Cart } from "@/interfaces/dashboard/admin";
-
-interface CartStatisticsProps {
-  cartsByStatus: Record<string, Cart[]>;
-}
+import { CartStatisticsProps } from "@/interfaces/dashboard/admin";
 
 export function CartStatistics({ cartsByStatus }: CartStatisticsProps) {
   return (

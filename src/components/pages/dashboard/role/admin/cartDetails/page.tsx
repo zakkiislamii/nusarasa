@@ -1,15 +1,10 @@
-import { Cart } from "@/interfaces/dashboard/admin";
-
 import {
   formatBalance,
   formatDateTime,
   calculateCartTotal,
 } from "@/services/client/dashboard/role/admin/all-member";
 import { CartItem } from "../CartItem/page";
-
-interface CartDetailsProps {
-  cart: Cart;
-}
+import { CartDetailsProps } from "@/interfaces/dashboard/admin";
 
 export function CartDetails({ cart }: CartDetailsProps) {
   return (

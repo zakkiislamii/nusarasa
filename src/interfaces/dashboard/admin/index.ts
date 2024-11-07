@@ -1,3 +1,5 @@
+import { SortKey } from "@/services/client/dashboard/role/admin/all-member";
+
 //F:\GitHub\nusarasa\src\interfaces\dashboard\admin\index.ts
 export interface Seller {
   id_user: string;
@@ -26,6 +28,18 @@ export interface Product {
   price: number;
 }
 
+export interface CartStatisticsProps {
+  cartsByStatus: Record<string, Cart[]>;
+}
+
+export interface CartDetailsProps {
+  cart: Cart;
+}
+
+export interface CartItemProps {
+  item: CartItem;
+}
+
 export interface Member {
   id_user: string;
   fullname: string | null;
@@ -37,21 +51,33 @@ export interface Member {
   carts: Cart[];
 }
 
+export interface MemberCardProps {
+  member: Member;
+  isExpanded: boolean;
+  onToggle: () => void;
+}
 export interface CartItemsProps {
   items: CartItem[];
 }
 
 export interface StatusBadgeProps {
-status:string
+  status: string;
 }
 export interface StatusBadgePropsValidate {
-status:string
+  status: string;
+}
+
+export interface HeaderProps {
+  searchTerm: string;
+  setSearchTerm: (term: string) => void;
+  sortBy: SortKey;
+  setSortBy: (key: SortKey) => void;
 }
 
 export interface Cart {
   id_cart: string;
   id_user: string;
-status:string
+  status: string;
   createdAt: string;
   updatedAt: string;
   items: CartItem[];

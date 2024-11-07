@@ -1,12 +1,6 @@
 import { Search, SortAsc } from "lucide-react";
 import { SortKey } from "@/services/client/dashboard/role/admin/all-member";
-
-interface HeaderProps {
-  searchTerm: string;
-  setSearchTerm: (term: string) => void;
-  sortBy: SortKey;
-  setSortBy: (key: SortKey) => void;
-}
+import { HeaderProps } from "@/interfaces/dashboard/admin";
 
 export function Header({
   searchTerm,

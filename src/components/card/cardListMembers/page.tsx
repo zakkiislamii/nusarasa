@@ -1,5 +1,3 @@
-// components/pages/dashboard/admin/member-list/MemberCard.tsx
-import { Member } from "@/interfaces/dashboard/admin";
 import { ChevronDown } from "lucide-react";
 
 import {
@@ -9,12 +7,7 @@ import {
 import StatusBadge from "@/components/pages/dashboard/role/admin/status/page";
 import { CartStatistics } from "@/components/pages/dashboard/role/admin/CartStatistics/page";
 import { CartDetails } from "@/components/pages/dashboard/role/admin/cartDetails/page";
-
-interface MemberCardProps {
-  member: Member;
-  isExpanded: boolean;
-  onToggle: () => void;
-}
+import { MemberCardProps } from "@/interfaces/dashboard/admin";
 
 export function MemberCard({ member, isExpanded, onToggle }: MemberCardProps) {
   const cartsByStatus = getCartsByStatus(member.carts);

@@ -1,9 +1,5 @@
-import { CartItem as CartItemType } from "@/interfaces/dashboard/admin";
+import { CartItemProps } from "@/interfaces/dashboard/admin";
 import { formatBalance } from "@/services/client/dashboard/role/admin/all-member";
-
-interface CartItemProps {
-  item: CartItemType;
-}
 
 export function CartItem({ item }: CartItemProps) {
   return (
