@@ -214,7 +214,6 @@ export const checkoutCart = async (req: NextRequest) => {
 
     return successResponse("Cart item has been checked out", result);
   } catch (error: any) {
-    // Handle specific errors dari query
     if (error instanceof Error) {
       switch (error.message) {
         case "Cart not found or inactive":

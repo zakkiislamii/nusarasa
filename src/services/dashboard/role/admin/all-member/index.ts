@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Member } from "@/interfaces/dashboard/admin";
+import { Cart, CartItem, Member } from "@/interfaces/dashboard/admin";
 import { getSession } from "@/utils/token/token";
 import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
-export type SortKey = keyof Member;
+export type SortKey = "fullname" | "username" | "email" | "balance";
 
 export const useGetAllMember = () => {
   const [members, setMembers] = useState<Member[]>([]);
@@ -40,6 +40,36 @@ export const useGetAllMember = () => {
   return { members, loading };
 };
 
+export const useMemberExpand = () => {
+  const [expandedMembers, setExpandedMembers] = useState<
+    Record<string, boolean>
+  >({});
+
+  const toggleMember = (memberId: string) => {
+    setExpandedMembers((prev) => ({
+      ...prev,
+      [memberId]: !prev[memberId],
+    }));
+  };
+
+  return {
+    expandedMembers,
+    toggleMember,
+  };
+};
+export const formatBalance = (balance: number) => {
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    minimumFractionDigits: 0,
+  }).format(balance);
+};
+
+// Get active cart count
+export const getActiveCartCount = (carts: Cart[]) => {
+  return carts.filter((cart) => cart.status === "active").length;
+};
+
 export const useFilteredAndSortedMembers = (
   initialSortBy: SortKey = "fullname"
 ) => {
@@ -70,4 +100,48 @@ export const useFilteredAndSortedMembers = (
     setSortBy,
     loading,
   };
+};
+
+export const getTotalItems = (carts: Cart[]) => {
+  return carts.reduce((total, cart) => {
+    return (
+      total +
+      cart.items.reduce((itemTotal, item) => itemTotal + item.quantity, 0)
+    );
+  }, 0);
+};
+
+export const calculateCartTotal = (items: CartItem[]) => {
+  return items.reduce((total, item) => {
+    return total + item.quantity * item.product.price;
+  }, 0);
+};
+
+export const getCartsByStatus = (carts: Cart[]) => {
+  const statusMap: Record<string, Cart[]> = {
+    active: [],
+    checkout: [],
+    completed: [],
+    cancelled: [],
+  };
+
+  carts.forEach((cart) => {
+    if (statusMap[cart.status]) {
+      statusMap[cart.status].push(cart);
+    }
+  });
+
+  return statusMap;
+};
+
+export const formatDateTime = (dateString: string) => {
+  const date = new Date(dateString);
+  return new Intl.DateTimeFormat("id-ID", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(date);
 };
