@@ -42,16 +42,16 @@ export interface CartItemsProps {
 }
 
 export interface StatusBadgeProps {
-  status: "active" | "checkout" | "completed" | "cancelled" | "default";
+status:string
 }
 export interface StatusBadgePropsValidate {
-  status: "active" | "checkout" | "completed" | "cancelled" | "default";
+status:string
 }
 
 export interface Cart {
   id_cart: string;
   id_user: string;
-  status: "active" | "checkout" | "completed" | "cancelled";
+status:string
   createdAt: string;
   updatedAt: string;
   items: CartItem[];

@@ -123,16 +123,7 @@ export default function Body() {
                       className="bg-gray-50 p-3 rounded-lg hover:shadow-sm transition-shadow"
                     >
                       <div className="flex justify-between items-center mb-2">
-                        <StatusBadge
-                          status={
-                            status as
-                              | "active"
-                              | "checkout"
-                              | "completed"
-                              | "cancelled"
-                              | "default"
-                          }
-                        />
+                        <StatusBadge status={status} />
                         <span className="text-lg font-bold text-gray-800">
                           {carts.length}
                         </span>
@@ -156,16 +147,7 @@ export default function Body() {
                         carts.length > 0 && (
                           <div key={status} className="space-y-4">
                             <div className="flex items-center gap-2">
-                              <StatusBadge
-                                status={
-                                  status as
-                                    | "active"
-                                    | "checkout"
-                                    | "completed"
-                                    | "cancelled"
-                                    | "default"
-                                }
-                              />
+                              <StatusBadge status={status} />
                               <h3 className="text-sm font-semibold text-gray-700">
                                 {status.charAt(0).toUpperCase() +
                                   status.slice(1)}{" "}

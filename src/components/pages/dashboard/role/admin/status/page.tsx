@@ -1,9 +1,7 @@
 import { StatusBadgePropsValidate } from "@/interfaces/dashboard/admin";
 
 const StatusBadge = ({ status }: StatusBadgePropsValidate) => {
-  const getStatusStyle = (
-    status: "active" | "checkout" | "completed" | "cancelled" | "default"
-  ) => {
+  const getStatusStyle = (status: string) => {
     switch (status) {
       case "active":
         return "bg-blue-100 text-blue-800 border-blue-200";
