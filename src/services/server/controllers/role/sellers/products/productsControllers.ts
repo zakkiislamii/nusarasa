@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { findManyProductsByToken } from "@/services/api/queries/role/sellers/products/productsQueries";
+import { findManyProductsByToken } from "@/services/server/queries/role/sellers/products/productsQueries";
 import {
   costumHandler,
   errorHandler,

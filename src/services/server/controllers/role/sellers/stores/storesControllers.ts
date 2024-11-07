@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { findManyStores } from "@/services/api/queries/role/sellers/stores/storesQueries";
+import { findManyStores } from "@/services/server/queries/role/sellers/stores/storesQueries";
 import {
   errorHandler,
   methodNotAllowedResponse,

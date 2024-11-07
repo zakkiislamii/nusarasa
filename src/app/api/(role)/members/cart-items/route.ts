@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import {
   addCartMembers,
   getCartByToken,
-} from "@/services/api/controllers/role/members/membersControllers";
+} from "@/services/server/controllers/role/members/membersControllers";
 
 export const POST = async (req: NextRequest) => {
   return await addCartMembers(req);

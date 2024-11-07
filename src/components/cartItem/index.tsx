@@ -1,6 +1,6 @@
 import { type FC } from "react";
 import { CartItemsProps } from "@/interfaces/cart";
-import { useCartItemsUser } from "@/services/homepage/cartItems";
+import { useCartItemsUser } from "@/services/client/homepage/cartItems";
 import {
   Dialog,
   DialogBackdrop,

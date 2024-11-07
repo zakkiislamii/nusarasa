@@ -4,7 +4,7 @@ import { encrypt } from "@/utils/token/token";
 import {
   saveDataFromGoogle,
   userWithRole,
-} from "@/services/api/queries/users/userQueries";
+} from "@/services/server/queries/users/userQueries";
 import { cookies } from "next/headers";
 import { Role } from "@prisma/client";
 

@@ -1,4 +1,4 @@
-import { getAllUsersForAdmins } from "@/services/api/controllers/role/admins/adminsControllers";
+import { getAllUsersForAdmins } from "@/services/server/controllers/role/admins/adminsControllers";
 import { NextRequest } from "next/server";
 
 export const GET = async (

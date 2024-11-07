@@ -3,9 +3,12 @@ import Image from "next/image";
 import Button from "@/components/buttoms/buttom submit";
 import { IMAGES } from "@/components/pages/edit-profile";
 import ButtonBack from "@/components/buttoms/buttom back";
-import { useProfileForm, onSubmit } from "@/services/dashboard/edit-profile";
+import {
+  useProfileForm,
+  onSubmit,
+} from "@/services/client/dashboard/edit-profile";
 import { useRouter } from "next/navigation";
-import { useProfileData } from "@/services/dashboard/profile";
+import { useProfileData } from "@/services/client/dashboard/profile";
 import LoadingState from "@/components/loading";
 
 export default function ContentEditProfile() {

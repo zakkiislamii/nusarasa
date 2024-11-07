@@ -1,4 +1,4 @@
-import { getAllStores } from "@/services/api/controllers/role/sellers/stores/storesControllers";
+import { getAllStores } from "@/services/server/controllers/role/sellers/stores/storesControllers";
 import { NextRequest } from "next/server";
 
 

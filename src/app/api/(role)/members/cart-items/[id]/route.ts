@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import {
   deleteCart,
   updateCartItem,
-} from "@/services/api/controllers/role/members/membersControllers";
+} from "@/services/server/controllers/role/members/membersControllers";
 
 export const DELETE = async (
   req: NextRequest,

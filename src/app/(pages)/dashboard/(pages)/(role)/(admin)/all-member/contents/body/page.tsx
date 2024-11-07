@@ -1,7 +1,6 @@
 "use client";
 import LoadingState from "@/components/loading";
-import { Member } from "@/interfaces/dashboard/admin";
-
+import { Member, StatusBadgeProps } from "@/interfaces/dashboard/admin";
 import {
   useFilteredAndSortedMembers,
   SortKey,
@@ -10,10 +9,36 @@ import {
   getCartsByStatus,
   formatDateTime,
   useMemberExpand,
-} from "@/services/dashboard/role/admin/all-member";
+} from "@/services/client/dashboard/role/admin/all-member";
 import { Search, SortAsc, ChevronDown } from "lucide-react";
-import { StatusBadge } from "../status/page";
-import { CardCartItems } from "../card/page";
+
+// Komponen StatusBadge internal
+const StatusBadge = ({ status }: StatusBadgeProps) => {
+  const getStatusStyle = (status: string) => {
+    switch (status.toLowerCase()) {
+      case "active":
+        return "bg-blue-100 text-blue-800 border-blue-200";
+      case "checkout":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case "completed":
+        return "bg-green-100 text-green-800 border-green-200";
+      case "cancelled":
+        return "bg-red-100 text-red-800 border-red-200";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200";
+    }
+  };
+
+  return (
+    <span
+      className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusStyle(
+        status
+      )}`}
+    >
+      {status.charAt(0).toUpperCase() + status.slice(1)}
+    </span>
+  );
+};
 
 export default function Body() {
   const {
@@ -185,7 +210,39 @@ export default function Body() {
                                   </span>
                                 </div>
                                 {cart.items.length > 0 ? (
-                                  <CardCartItems items={cart.items} />
+                                  <div className="space-y-2">
+                                    {cart.items.map((item) => (
+                                      <div
+                                        key={item.id_cartItem}
+                                        className="bg-white p-3 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                                      >
+                                        <div className="flex justify-between items-start mb-2">
+                                          <span className="font-semibold text-gray-800">
+                                            {item.product.product_name}
+                                          </span>
+                                          <span className="text-blue-600 font-medium bg-blue-50 px-2 py-1 rounded text-sm">
+                                            {formatBalance(item.product.price)}
+                                          </span>
+                                        </div>
+                                        <div className="flex justify-between items-center">
+                                          <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                                            {item.store.store_name}
+                                          </span>
+                                          <div className="flex items-center gap-3">
+                                            <span className="text-xs text-gray-500">
+                                              Qty: {item.quantity}
+                                            </span>
+                                            <span className="text-sm font-medium text-blue-600">
+                                              {formatBalance(
+                                                item.quantity *
+                                                  item.product.price
+                                              )}
+                                            </span>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
                                 ) : (
                                   <div className="text-center py-8 bg-white rounded-lg">
                                     <p className="text-gray-400 text-sm">

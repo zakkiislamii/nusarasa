@@ -8,8 +8,8 @@ import {
   IMAGES,
   NAV_LINKS_PRODUCTS,
 } from "../../../../components/navbar/index";
-import { useScrollHandler, useLogout } from "@/services/auth/login";
-import { useCheckLoginUser } from "@/services/auth/checkLogin";
+import { useScrollHandler, useLogout } from "@/services/client/auth/login";
+import { useCheckLoginUser } from "@/services/client/auth/checkLogin";
 import Member from "@/components/navbar/role/member/page";
 import Admin from "@/components/navbar/role/admin/page";
 import Seller from "@/components/navbar/role/seller/page";

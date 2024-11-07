@@ -1,4 +1,4 @@
-import { getAllUsersByRole } from "@/services/api/queries/role/admins/adminsQueries";
+import { getAllUsersByRole } from "@/services/server/queries/role/admins/adminsQueries";
 import {
   costumHandler,
   errorHandler,

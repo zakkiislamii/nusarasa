@@ -1,7 +1,7 @@
 // Body.tsx
 "use client";
 
-import { useHistory } from "@/services/dashboard/role/member/history";
+import { useHistory } from "@/services/client/dashboard/role/member/history";
 
 export default function Body() {
   const {

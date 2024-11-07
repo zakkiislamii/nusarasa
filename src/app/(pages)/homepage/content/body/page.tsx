@@ -2,11 +2,11 @@
 
 "use client";
 import React, { useState } from "react";
-import { useGetAllStores } from "@/services/homepage/stores";
+import { useGetAllStores } from "@/services/client/homepage/stores";
 import LoadingState from "@/components/loading";
 import { Product, Store } from "@/interfaces/homepage";
 import CardHome from "@/components/card/cardHome";
-import { useHandleCardHome } from "@/services/homepage/cardHome";
+import { useHandleCardHome } from "@/services/client/homepage/cardHome";
 
 export default function Body() {
   const { stores, setStores, isLoading, error } = useGetAllStores();

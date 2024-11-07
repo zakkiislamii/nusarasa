@@ -9,7 +9,7 @@ import {
   useLogin,
   useLoginForm,
   useTogglePassword,
-} from "@/services/auth/login";
+} from "@/services/client/auth/login";
 
 export default function ContentOfLogin() {
   console.log("useLogin imported==> ", useLogin);

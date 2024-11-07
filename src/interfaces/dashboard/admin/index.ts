@@ -1,3 +1,4 @@
+//F:\GitHub\nusarasa\src\interfaces\dashboard\admin\index.ts
 export interface Seller {
   id_user: string;
   fullname: string;
@@ -39,6 +40,7 @@ export interface Member {
 export interface CartItemsProps {
   items: CartItem[];
 }
+
 export interface StatusBadgeProps {
   status: string;
 }

@@ -2,7 +2,7 @@
 import Button from "@/components/buttoms/buttom submit";
 import Image from "next/image";
 import { IMAGES } from "@/components/pages/profile";
-import { useProfileData } from "@/services/dashboard/profile";
+import { useProfileData } from "@/services/client/dashboard/profile";
 import { useRouter } from "next/navigation";
 import LoadingState from "@/components/loading";
 

@@ -1,7 +1,7 @@
 "use client";
 
-import { useCheckLoginUser } from "@/services/auth/checkLogin";
-import { useProfileData } from "@/services/dashboard/profile";
+import { useCheckLoginUser } from "@/services/client/auth/checkLogin";
+import { useProfileData } from "@/services/client/dashboard/profile";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
