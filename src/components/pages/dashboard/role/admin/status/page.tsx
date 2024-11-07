@@ -1,15 +1,9 @@
-"use client";
+import { StatusBadgePropsValidate } from "@/interfaces/dashboard/admin";
 
-import { FC } from "react";
-
-type StatusType = "active" | "checkout" | "completed" | "cancelled" | "default";
-
-interface StatusBadgeProps {
-  status: StatusType;
-}
-
-const StatusBadge: FC<StatusBadgeProps> = ({ status }) => {
-  const getStatusStyle = (status: StatusType) => {
+const StatusBadge = ({ status }: StatusBadgePropsValidate) => {
+  const getStatusStyle = (
+    status: "active" | "checkout" | "completed" | "cancelled" | "default"
+  ) => {
     switch (status) {
       case "active":
         return "bg-blue-100 text-blue-800 border-blue-200";
