@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+"use client";
 import { Cart, CartItem, Member } from "@/interfaces/dashboard/admin";
 import { getSession } from "@/utils/token/token";
 import axios from "axios";
