@@ -441,3 +441,44 @@ export const checkoutHistory = async (id_user: string) => {
   });
   return data;
 };
+
+export const topUpMembers = async (token: string, balance: number) => {
+  try {
+    // Validate minimum amount
+    if (balance < 10000) {
+      throw new Error("Minimum top up amount is Rp 10.000");
+    }
+
+    // Validate user exists
+    const existingUser = await prisma.users.findUnique({
+      where: { token },
+    });
+
+    if (!existingUser) {
+      throw new Error("User not found");
+    }
+
+    const updatedUser = await prisma.users.update({
+      where: {
+        token: token,
+      },
+      data: {
+        balance: {
+          increment: balance,
+        },
+      },
+      select: {
+        id_user: true,
+        fullname: true,
+        balance: true,
+        email: true,
+      },
+    });
+    return updatedUser;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    }
+    throw new Error("An unexpected error occurred during top up");
+  }
+};

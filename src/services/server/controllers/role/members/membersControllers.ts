@@ -7,6 +7,7 @@ import {
   getCart,
   getUserByToken,
   removeFromCart,
+  topUpMembers,
   updateCartItemQuantity,
 } from "../../../queries/role/members/membersQueries";
 import {
@@ -256,6 +257,32 @@ export const historyCart = async (req: NextRequest) => {
     }
     const data = await checkoutHistory(user.id_user);
     return successResponse("Success get history members", data);
+  } catch (error: any) {
+    return errorHandler(error, error.message);
+  }
+};
+
+export const topUp = async (req: NextRequest) => {
+  if (!isValidApiKey(req)) {
+    return unauthorizedResponse();
+  }
+
+  if (req.method !== "POST") {
+    return methodNotAllowedResponse();
+  }
+
+  const { isValid, error, token } = await validateAuthMembers(req);
+  if (!isValid || !token) {
+    return error;
+  }
+
+  try {
+    const { balance } = await req.json();
+    if (!balance) {
+      return badRequestResponse("Balance field is required");
+    }
+    const data = await topUpMembers(token, balance);
+    return successResponse("Success Top Up", data);
   } catch (error: any) {
     return errorHandler(error, error.message);
   }
